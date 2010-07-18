@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Event::BlipContributorsChanged;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

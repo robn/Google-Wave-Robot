@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Event::WaveletTitleChanged;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

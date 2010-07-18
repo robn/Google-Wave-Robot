@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Wavelet::TagSet;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

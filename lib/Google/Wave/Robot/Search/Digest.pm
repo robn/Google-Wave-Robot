@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Search::Digest;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

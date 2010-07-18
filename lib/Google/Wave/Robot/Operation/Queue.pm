@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Operation::Queue;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

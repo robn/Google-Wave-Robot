@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Element::TextArea;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

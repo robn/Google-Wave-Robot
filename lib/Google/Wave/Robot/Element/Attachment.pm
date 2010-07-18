@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Element::Attachment;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

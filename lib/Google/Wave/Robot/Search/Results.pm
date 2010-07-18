@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Search::Results;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

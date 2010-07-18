@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Element::Installer;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

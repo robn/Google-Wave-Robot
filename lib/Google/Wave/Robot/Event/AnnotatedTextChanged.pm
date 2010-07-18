@@ -1,7 +1,7 @@
 package Google::Wave::Robot::Event::AnnotatedTextChanged;
 
 use warnings;
-use strict
+use strict;
 
 1;
 

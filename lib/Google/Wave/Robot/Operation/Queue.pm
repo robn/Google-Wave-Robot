@@ -10,19 +10,21 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 
+use Google::Wave::Robot::Operation;
+
 use Clone qw(clone);
 
 my $next_operation_id = 1;
+
+has "capabilities_hash" => (
+    is  => "rw",
+    isa => "Str"
+);
 
 has "_pending" => (
     is      => "rw",
     isa     => "ArrayRef",
     default => sub { [] },
-);
-
-has "_capability_hash" => (
-    is  => "rw",
-    isa => "Str"
 );
 
 has "_proxy_for_id" => (
@@ -63,6 +65,19 @@ method _new_waveletdata ( Str :$domain, ArrayRef :$participants ) {
     };
 
     return ($blip_data, $wavelet_data);
+}
+
+method serialize ( Str :$method_prefix? = '' ) {
+    my $notify = Google::Wave::Robot::Operation->new(
+        method => Google::Wave::Robot::Operation::ROBOT_NOTIFY,
+        id     => Google::Wave::Robot::Operation::NOTIFY_OP_ID,
+        params => {
+            capabilitiesHash => $self->capabilities_hash,
+            protocolVersion  => Google::Wave::Robot::Operation::PROTOCOL_VERSION,
+        },
+    );
+
+    return [map { $_->serialize } ($notify, @{$self->_pending})];
 }
 
 __PACKAGE__->meta->make_immutable;

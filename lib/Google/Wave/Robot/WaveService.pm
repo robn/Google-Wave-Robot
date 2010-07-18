@@ -5,15 +5,13 @@ use 5.010;
 use warnings;
 use strict;
 
-use Params::Validate qw(validate :types);
+use Moose;
+use MooseX::Method::Signatures;
+
 use LWP::UserAgent;
 use Net::OAuth 0.25;
 use JSON qw(encode_json decode_json);
-use Carp qw(croak);
-
-use URI::Escape;
 use Data::Random qw(rand_chars);
-use Carp;
 
 use constant REQUEST_TOKEN_URL => q{https://www.google.com/accounts/OAuthGetRequestToken};
 use constant ACCESS_TOKEN_URL  => q{https://www.google.com/accounts/OAuthGetAccessToken};
@@ -24,44 +22,64 @@ use constant SCOPE             => q{http://wave.googleusercontent.com/api/rpc};
 use constant RPC_URL           => q{https://www-opensocial.googleusercontent.com/api/rpc};
 use constant SANDBOX_RPC_URL   => q{https://www-opensocial-sandbox.googleusercontent.com/api/rpc};
 
-sub new {
-    my $class = shift;
+has "_server_rpc_base" => (
+    is  => "rw",
+    isa => "Str",
+);
 
-    my %args = validate(@_, {
-        use_sandbox     => { type => BOOLEAN, default => 0           },
-        server_rpc_base => { type => SCALAR,  default => undef       },
-        consumer_key    => { type => SCALAR,  default => "anonymous" },
-        consumer_secret => { type => SCALAR,  default => "anonymous" },
-        http_post       => { type => CODEREF, default => undef       },
-    });
+has "_consumer_key" => (
+    is  => "rw",
+    isa => "Str",
+);
 
-    my $self = {};
+has "_consumer_secret" => (
+    is  => "rw",
+    isa => "Str",
+);
 
-    $self->{_server_rpc_base} = $args{server_rpc_base} ? $args{server_rpc_base} :
-                                $args{use_sandbox}     ? SANDBOX_RPC_URL        :
-                                                         RPC_URL;
+has "_http_post" => (
+    is  => "rw",
+    isa => "CodeRef",
+);
 
-    $self->{_consumer_key}    = $args{consumer_key};
-    $self->{_consumer_secret} = $args{consumer_secret};
+has "_ua" => (
+    is  => "rw",
+    isa => "LWP::UserAgent",
+);
 
-    $self->{_http_post} = $args{http_post} // \&http_post;
+has "_access_token" => (
+    is  => "rw",
+    isa => "Str",
+);
 
-    $self->{_ua} = LWP::UserAgent->new;
+has "_access_token_secret" => (
+    is  => "rw",
+    isa => "Str",
+);
 
-    return bless $self, $class;
+method BUILDARGS ( ClassName $class:
+                   Bool      :$use_sandbox?, 
+                   Str       :$server_rpc_base?, 
+                   Str       :$consumer_key? = "anonymous", 
+                   Str       :$consumer_secret? = "anonymous", 
+                   CodeRef   :$http_post? ) {
+
+    return {
+        _server_rpc_base => $server_rpc_base ? $server_rpc_base :
+                            $use_sandbox     ? SANDBOX_RPC_URL  :
+                                               RPC_URL,
+
+        _consumer_key    => $consumer_key,
+        _consumer_secret => $consumer_secret,
+
+        _http_post => $http_post // \&http_post,
+
+        _ua        => LWP::UserAgent->new,
+    };
 }
 
+=pod
 sub _make_token {
-}
-
-sub set_http_post {
-    my $self = shift;
-
-    my %args = validate(@_, {
-        http_post => CODEREF,
-    });
-
-    $self->{_http_post} = $args{http_post};
 }
 
 sub get_token_from_request {
@@ -75,34 +93,14 @@ sub generate_authorization_url {
 
 sub upgrade_to_access_token {
 }
+=cut
 
-sub set_access_token {
-    my $self = shift;
-
-    my %args = validate(@_, {
-        token  => "SCALAR",
-        secret => "SCALAR",
-    });
-
-    $self->{_access_token}        = $args{token};
-    $self->{_access_token_secret} = $args{secret};
-}
-
-sub http_post {
-    my $self = shift;
-
-    my %args = validate(@_, {
-        url     => { type => SCALAR },
-        data    => { type => SCALAR },
-        headers => { type => HASHREF, default => {} },
-    });
-
-    my $url = $args{url};
+method do_http_post ( Str :$url, Str :$data, HashRef :$headers? = {} ) {
     while (1) {
-        my $res = $self->{_ua}->post($url, %{$args{headers}}, Content => $args{data});
+        my $res = $self->{_ua}->post($url, %{$headers}, Content => $data);
 
         if (! $res->is_redirect) {
-            return [ $res->code, $res->content ];
+            return ($res->code, $res->content);
         }
 
         $url = $res->header("Location");
@@ -110,6 +108,31 @@ sub http_post {
 
     # we don't get here
 }
+
+method make_rpc ( Google::Wave::Robot::Operation::Queue :$queue )
+{
+}
+
+around "make_rpc" => sub {
+    my $orig = shift;
+    my $self = shift;
+    my %args = @_;
+
+    if ($args{queue}) {
+        if (ref $args{queue} eq "Google::Wave::Robot::Operation") {
+            $args{queue} = [$args{queue}];
+        }
+
+        if (ref $args{queue} eq "ARRAY") {
+            confess
+    }
+
+    return $self->$orig(%args);
+};
+
+1;
+
+__END__
 
 sub make_rpc {
     my $self = shift;

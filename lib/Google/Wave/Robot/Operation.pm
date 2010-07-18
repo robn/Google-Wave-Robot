@@ -29,13 +29,15 @@ use constant {
 use constant NOTIFY_OP_ID => '0';
 
 has "method" => (
-    is  => "ro",
-    isa => "Str",
+    is       => "ro",
+    isa      => "Str",
+    required => 1,
 );
 
 has "id" => (
-    is  => "ro",
-    isa => "Str",
+    is       => "ro",
+    isa      => "Str",
+    required => 1,
 );
 
 has "params" => (

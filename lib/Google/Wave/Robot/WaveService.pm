@@ -5,9 +5,11 @@ use 5.010;
 use warnings;
 use strict;
 
-use URI::Escape;
-use Net::OAuth 0.25;
+use Params::Validate qw(validate :types);
 use LWP::UserAgent;
+use Net::OAuth 0.25;
+
+use URI::Escape;
 use Data::Random qw(rand_chars);
 use JSON qw(encode_json decode_json);
 use Carp;
@@ -22,6 +24,30 @@ use constant RPC_URL           => q{https://www-opensocial.googleusercontent.com
 use constant SANDBOX_RPC_URL   => q{https://www-opensocial-sandbox.googleusercontent.com/api/rpc};
 
 sub new {
+    my $class = shift;
+
+    my %args = validate(@_, {
+        use_sandbox     => { type => BOOLEAN, default => 0           },
+        server_rpc_base => { type => SCALAR,  default => undef       },
+        consumer_key    => { type => SCALAR,  default => "anonymous" },
+        consumer_secret => { type => SCALAR,  default => "anonymous" },
+        http_post       => { type => CODEREF, default => undef       },
+    });
+
+    my $self = {};
+
+    $self->{_server_rpc_base} = $args{server_rpc_base} ? $args{server_rpc_base} :
+                                $args{use_sandbox}     ? SANDBOX_RPC_URL        :
+                                                         RPC_URL;
+
+    $self->{_consumer_key}    = $args{consumer_key};
+    $self->{_consumer_secret} = $args{consumer_secret};
+
+    $self->{_http_post} = $args{http_post};
+
+    $self->{_connection} = LWP::UserAgent->new;
+
+    return bless $self, $class;
 }
 
 sub _make_token {

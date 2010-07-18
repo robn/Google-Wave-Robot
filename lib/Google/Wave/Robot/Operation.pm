@@ -28,20 +28,20 @@ use constant {
 
 use constant NOTIFY_OP_ID => '0';
 
-has "method" => {
+has "method" => (
     is  => "ro",
     isa => "Str",
-};
+);
 
-has "id" => {
+has "id" => (
     is  => "ro",
     isa => "Str",
-};
+);
 
-has "params" => {
+has "params" => (
     is  => "ro",
     isa => "HashRef",
-};
+);
 
 method serialize ( Str :$method_prefix? = '') {
     $method_prefix += '.' if $method_prefix;

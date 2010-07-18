@@ -8,10 +8,11 @@ use strict;
 use Params::Validate qw(validate :types);
 use LWP::UserAgent;
 use Net::OAuth 0.25;
+use JSON qw(encode_json decode_json);
+use Carp qw(croak);
 
 use URI::Escape;
 use Data::Random qw(rand_chars);
-use JSON qw(encode_json decode_json);
 use Carp;
 
 use constant REQUEST_TOKEN_URL => q{https://www.google.com/accounts/OAuthGetRequestToken};
@@ -43,9 +44,9 @@ sub new {
     $self->{_consumer_key}    = $args{consumer_key};
     $self->{_consumer_secret} = $args{consumer_secret};
 
-    $self->{_http_post} = $args{http_post};
+    $self->{_http_post} = $args{http_post} // \&http_post;
 
-    $self->{_connection} = LWP::UserAgent->new;
+    $self->{_ua} = LWP::UserAgent->new;
 
     return bless $self, $class;
 }
@@ -53,7 +54,14 @@ sub new {
 sub _make_token {
 }
 
-sub _set_http_post {
+sub set_http_post {
+    my $self = shift;
+
+    my %args = validate(@_, {
+        http_post => CODEREF,
+    });
+
+    $self->{_http_post} = $args{http_post};
 }
 
 sub get_token_from_request {
@@ -69,21 +77,145 @@ sub upgrade_to_access_token {
 }
 
 sub set_access_token {
+    my $self = shift;
+
+    my %args = validate(@_, {
+        token  => "SCALAR",
+        secret => "SCALAR",
+    });
+
+    $self->{_access_token}        = $args{token};
+    $self->{_access_token_secret} = $args{secret};
 }
 
 sub http_post {
+    my $self = shift;
+
+    my %args = validate(@_, {
+        url     => { type => SCALAR },
+        data    => { type => SCALAR },
+        headers => { type => HASHREF, default => {} },
+    });
+
+    my $url = $args{url};
+    while (1) {
+        my $res = $self->{_ua}->post($url, %{$args{headers}}, Content => $args{data});
+
+        if (! $res->is_redirect) {
+            return [ $res->code, $res->content ];
+        }
+
+        $url = $res->header("Location");
+    }
+
+    # we don't get here
 }
 
 sub make_rpc {
+    my $self = shift;
+
+    my %args = validate(@_, {
+        operations => {
+            callbacks => {
+                'Operation, list of Operations or Operation::Queue' => sub {
+                    my $value = shift;
+                    return 0 if !$value;
+                    return 1 if ref $value eq q{Google::Wave::Robot::Operation};
+                    return 1 if ref $value eq q{Google::Wave::Robot::Operation::Queue};
+                    return 0 if ref $value ne "ARRAY";
+                    return 0 if grep { ref $_ ne q{Google::Wave::Robot::Operation} } @$value;
+                    return 1;
+                },
+            },
+        },
+    });
+
+    my $queue;
+    given (ref $args{operations}) {
+        when (q{Google::Wave::Robot::Operation::Queue}) {
+            $queue = $args{operations};
+        }
+        when (q{Google::Wave::Robot::Operation}) {
+            $args{operations} = [$args{operations}];
+            continue;
+        }
+        default {
+            $queue = Google::Wave::Robot::Operation::Queue->new;
+            $queue->copy_operations($args{operations});
+        }
+    }
+
+    my $data = encode_json($queue->serialize({ method_prefix => 'wave' }));
+
+    my $oauth_req = Net::OAuth->request("protected resource")->new(
+        $self->_default_request_params("POST"),
+        request_url  => $self->{_server_rpc_base},
+        token        => $self->{_access_token},
+        token_secret => $self->{_access_token_secret},
+    );
+    $oauth_req->sign;
+
+    my $headers = {
+        "Content-Type"  => "application/json",
+        "Authorization" => $oauth_req->to_authorization_header,
+    };
+
+    my ($status, $content) = $self->{_http_post}->($self, {
+        url     => $self->{_server_rpc_base},
+        data    => $data,
+        headers => $headers,
+    });
+
+    croak "rpc error: $status\n$content" if $status != 200;   # XXX Error::RpcError
+
+    return decode_json($content);
+}
+
+sub _default_request_params {
+    my ($self, $method) = @_;
+    $method //= "GET";
+
+    return (
+        protocol_version => $Net::OAuth::PROTOCOL_VERSION_1_0A,
+        consumer_key     => $self->consumer_key,
+        consumer_secret  => $self->consumer_secret,
+        request_method   => $method,
+        signature_method => "HMAC-SHA1",
+        timestamp        => time,
+        nonce            => join('', rand_chars(size => 16, set => "alphanumeric"))
+    );
 }
 
 sub _first_rpc_result {
+    my ($self, $result) = @_;
+
+    my ($first) = grep { $_->{id} ne Google::Wave::Operation::NOTIFY_OP_ID } values %$result;
+    croak "rpc error: no results found" if ! $first;    # XXX Error::RpcError
+
+    my $error = $first->{error};
+    croak "rpc error: $error->{code}: $error->{message}" if $error;     # XXX Error::RpcError
+
+    croak "rpc error: no data record" if ! $first->{data};
+
+    return $first->{data};
 }
 
 sub _wavelet_from_json {
 }
 
 sub search {
+    my $self = shift;
+
+    my %args = validate(@_, {
+        query       => "SCALAR",
+        index       => { type => "SCALAR", default => undef },
+        num_results => { type => "SCALAR", default => undef },
+    });
+
+    my $queue = Google::Wave::Operation::Queue->new;
+    $queue->robot_search(\%args);
+    my $result = $self->_first_rpc_result($self->make_rpc($queue));
+    return Google::Wave::Search::Results($result);
 }
 
 sub new_wave {

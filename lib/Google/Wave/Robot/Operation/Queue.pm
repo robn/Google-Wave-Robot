@@ -1,7 +1,11 @@
 package Google::Wave::Robot::Operation::Queue;
 
+use 5.010;
+
 use warnings;
 use strict;
+
+use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
@@ -62,8 +66,6 @@ method _new_waveletdata ( Str :$domain, ArrayRef :$participants ) {
 }
 
 __PACKAGE__->meta->make_immutable;
-
-no Moose;
 
 1;
 

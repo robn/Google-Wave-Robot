@@ -119,43 +119,44 @@ method wavelet_append_blip ( Str :$wave_id, Str :$wavelet_id, Str :$initial_cont
     );
 }
 
-method wavelet_add_participant () {
+method wavelet_add_participant ( Str :$wave_id, Str :$wavelet_id, Str :$participant_id ) {
 }
 
-method wavelet_datadoc_set () {
+method wavelet_datadoc_set ( Str :$wave_id, Str :$wavelet_id, Str :$name, Str :$data ) {
 }
 
-method robot_create_wavelet () {
+method robot_create_wavelet ( Str :$domain, ArrayRef[Str] :$participants, Str :$message? = '' ) {
 }
 
-method robot_search () {
+method robot_search ( Str :$query, Int :$index?, Int :$num_results? ) {
 }
 
-method robot_fetch_wave () {
+method robot_fetch_wave ( Str :$wave_id, Str :$wavelet_id ) {
 }
 
-method wavelet_set_title () {
+method wavelet_set_title ( Str :$wave_id, Str :$wavelet_id, Str :$title ) {
 }
 
-method wavelet_modify_participant_role () {
+method wavelet_modify_participant_role ( Str :$wave_id, Str :$wavelet_id, Str :$participant_id, Str :$role ) {
+    # XXX what type should $role have?
 }
 
-method wavelet_modify_tag () {
+method wavelet_modify_tag ( Str :$wave_id, Str :$wavelet_id, Str :$tag, Str :$modify_how = 'add' ) {
 }
 
-method blip_create_child () {
+method blip_create_child ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
 }
 
-method blip_delete () {
+method blip_delete ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
 }
 
-method document_append_markup () {
+method document_append_markup ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id, Str :$content ) {
 }
 
-method document_modify () {
+method document_modify ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
 }
 
-method document_inline_blip_insert () {
+method document_inline_blip_insert ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id, Int :$position ) {
 }
 
 __PACKAGE__->meta->make_immutable;

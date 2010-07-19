@@ -102,6 +102,48 @@ method new_operation ( Str :$method, Str :$wave_id?, Str :$wavelet_id?, HashRef 
     return $operation;
 }
 
+method wavelet_append_blip () {
+}
+
+method wavelet_add_participant () {
+}
+
+method wavelet_datadoc_set () {
+}
+
+method robot_create_wavelet () {
+}
+
+method robot_search () {
+}
+
+method robot_fetch_wave () {
+}
+
+method wavelet_set_title () {
+}
+
+method wavelet_modify_participant_role () {
+}
+
+method wavelet_modify_tag () {
+}
+
+method blip_create_child () {
+}
+
+method blip_delete () {
+}
+
+method document_append_markup () {
+}
+
+method document_modify () {
+}
+
+method document_inline_blip_insert () {
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -10,6 +10,8 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 
+use Clone qw(clone);
+
 use constant PROTOCOL_VERSION => "0.22";
 
 use constant {

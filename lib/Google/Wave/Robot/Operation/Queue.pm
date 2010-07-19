@@ -22,9 +22,13 @@ has "capabilities_hash" => (
 );
 
 has "_pending" => (
+    traits  => ["Array"],
     is      => "rw",
-    isa     => "ArrayRef",
+    isa     => "ArrayRef[Google::Wave::Robot::Operation]",
     default => sub { [] },
+    handles => {
+        push => 'push',
+    },
 );
 
 has "_proxy_for_id" => (
@@ -78,6 +82,24 @@ method serialize ( Str :$method_prefix? = '' ) {
     );
 
     return [map { $_->serialize } ($notify, @{$self->_pending})];
+}
+
+method new_operation ( Str :$method, Str :$wave_id?, Str :$wavelet_id?, HashRef :$params? = {}) {
+    $params = clone($params);
+
+    $params->{waveId}    = $wave_id    if $wave_id;
+    $params->{waveletId} = $wavelet_id if $wavelet_id;
+
+    $params->{proxyingFor} = $self->_proxy_for_id if $self->_proxy_for_id;
+
+    my $operation = Google::Wave::Robot::Operation->new(
+        method => $method,
+        id     => $next_operation_id++,
+        params => $params,
+    );
+    $self->push($operation);
+
+    return $operation;
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -109,7 +109,7 @@ method wavelet_append_blip ( Str :$wave_id, Str :$wavelet_id, Str :$initial_cont
         initial_content => $initial_content,
     );
 
-    return $self->new_operation(
+    $self->new_operation(
         method     => Google::Wave::Robot::Operation::WAVELET_APPEND_BLIP,
         wave_id    => $wave_id,
         wavelet_id => $wavelet_id,
@@ -117,46 +117,181 @@ method wavelet_append_blip ( Str :$wave_id, Str :$wavelet_id, Str :$initial_cont
             blipData => $blip_data,
         },
     );
+
+    return $blip_data;
 }
 
 method wavelet_add_participant ( Str :$wave_id, Str :$wavelet_id, Str :$participant_id ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::WAVELET_ADD_PARTICIPANT,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            participantId => $participant_id,
+        },
+    );
 }
 
 method wavelet_datadoc_set ( Str :$wave_id, Str :$wavelet_id, Str :$name, Str :$data ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::WAVELET_DATADOC_SET,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            datadocName  => $name,
+            datadocValue => $data,
+        },
+    );
 }
 
-method robot_create_wavelet ( Str :$domain, ArrayRef[Str] :$participants, Str :$message? = '' ) {
+method robot_create_wavelet ( Str :$domain, ArrayRef[Str] :$participants? = [], Str :$message? = '' ) {
+    my ($blip_data, $wavelet_data) = $self->_new_wavelet_data(domain => $domain, participant => $participants);
+
+    my $params = {
+        waveletData => $wavelet_data,
+    };
+    $params->{message} = $message if $message and $message ne '';
+
+    $self->new_operation(
+        method     => Google::Wave::Robot::Operation::ROBOT_CREATE_WAVELET,
+        wave_id    => $wavelet_data->{waveId},
+        wavelet_id => $wavelet_data->{waveletId},
+        params     => $params,
+    );
+
+    return ($blip_data, $wavelet_data);
 }
 
 method robot_search ( Str :$query, Int :$index?, Int :$num_results? ) {
+    my $params = {
+        query => $query,
+    };
+    $params->{index}      = $index if defined $index;
+    $params->{numResults} = $num_results if defined $num_results;
+
+    return $self->new_operation(
+        method => Google::Wave::Robot::Operation::ROBOT_SEARCH,
+        params => $params,
+    );
 }
 
 method robot_fetch_wave ( Str :$wave_id, Str :$wavelet_id ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::ROBOT_FETCH_WAVE,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+    );
 }
 
 method wavelet_set_title ( Str :$wave_id, Str :$wavelet_id, Str :$title ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::WAVELET_SET_TITLE,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            waveletTitle => $title,
+        },
+    );
 }
 
 method wavelet_modify_participant_role ( Str :$wave_id, Str :$wavelet_id, Str :$participant_id, Str :$role ) {
     # XXX what type should $role have?
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::WAVELET_MODIFY_PARTICIPANT_ROLE,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            participantId   => $participant_id,
+            participantRole => $role,
+        },
+    );
 }
 
 method wavelet_modify_tag ( Str :$wave_id, Str :$wavelet_id, Str :$tag, Str :$modify_how = 'add' ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::WAVELET_MODIFY_TAG,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            name       => $tag,
+            modify_how => $modify_how,  # XXX should this be modifyHow? bug in python cl?
+        },
+    );
 }
 
 method blip_create_child ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
+    my $blip_data = $self->_new_blip_data(
+        wave_id        => $wave_id,
+        wavelet_id     => $wavelet_id,
+        parent_blip_id => $blip_id,
+    );
+
+    $self->new_operation(
+        method     => Google::Wave::Robot::Operation::BLIP_CREATE_CHILD,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            blipId   => $blip_id,
+            blipData => $blip_data,
+        },
+    );
+
+    return $blip_data;
 }
 
 method blip_delete ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::BLIP_DELETE,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            blipId => $blip_id,
+        },
+    );
 }
 
 method document_append_markup ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id, Str :$content ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::DOCUMENT_APPEND_MARKUP,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            blipId  => $blip_id,
+            content => $content,
+        },
+    );
 }
 
 method document_modify ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::DOCUMENT_MODIFY,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            blipId => $blip_id,
+        },
+    );
 }
 
 method document_inline_blip_insert ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id, Int :$position ) {
+    my $blip_data = $self->_new_blip_data(
+        wave_id        => $wave_id,
+        wavelet_id     => $wavelet_id,
+        parent_blip_id => $blip_id,
+    );
+
+    $self->new_operation(
+        method     => Google::Wave::Robot::Operation::DOCUMENT_INLINE_BLIP_INSERT,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            blipId   => $blip_id,
+            index    => $position,
+            blipData => $blip_data,
+        },
+    );
+
+    return $blip_data;
 }
 
 __PACKAGE__->meta->make_immutable;

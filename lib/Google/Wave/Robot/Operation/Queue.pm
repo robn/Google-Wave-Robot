@@ -36,10 +36,10 @@ has "_proxy_for_id" => (
     isa => "Str",
 );
 
-method _new_blipdata ( Str :$wave_id,
-                       Str :$wavelet_id, 
-                       Str :$initial_content? = '', 
-                       Str :$parent_blip_id? ) {
+method _new_blip_data ( Str :$wave_id,
+                        Str :$wavelet_id, 
+                        Str :$initial_content? = '', 
+                        Str :$parent_blip_id? ) {
     
     my $blip_id = sprintf q{TBD_%s_0x%08x}, $wavelet_id, int rand 2**32;
 
@@ -52,11 +52,11 @@ method _new_blipdata ( Str :$wave_id,
     };
 }
 
-method _new_waveletdata ( Str :$domain, ArrayRef :$participants ) {
+method _new_wavelet_data ( Str :$domain, ArrayRef :$participants ) {
     my $wave_id = sprintf q{%s!TBD_0x%08x}, $domain, int rand 2**32;
     my $wavelet_id = "$domain!conv+root";
 
-    my $blip_data = $self->_new_blipdata(
+    my $blip_data = $self->_new_blip_data(
         wave_id    => $wave_id,
         wavelet_id => $wavelet_id,
     );
@@ -102,7 +102,21 @@ method new_operation ( Str :$method, Str :$wave_id?, Str :$wavelet_id?, HashRef 
     return $operation;
 }
 
-method wavelet_append_blip () {
+method wavelet_append_blip ( Str :$wave_id, Str :$wavelet_id, Str :$initial_content? = '' ) {
+    my $blip_data = $self->_new_blip_data(
+        wave_id         => $wave_id,
+        wavelet_id      => $wavelet_id,
+        initial_content => $initial_content,
+    );
+
+    return $self->new_operation(
+        method     => Google::Wave::Robot::Operation::WAVELET_APPEND_BLIP,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            blipData => $blip_data,
+        },
+    );
 }
 
 method wavelet_add_participant () {

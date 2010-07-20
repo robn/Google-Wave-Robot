@@ -20,7 +20,7 @@ has "button_name" => (
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
     return {
-        button_name => $json->{properties}->{buttonName};
+        button_name => $json->{properties}->{buttonName},
     };
 }
 

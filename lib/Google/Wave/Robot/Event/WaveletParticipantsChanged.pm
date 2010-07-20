@@ -26,8 +26,8 @@ has "participants_removed" => (
 
 method BUILDARGS ( ClassName $class: JSON :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
     return {
-        participants_added   => $json->{properties}->{particpantsAdded},
-        participants_removed => $json->{properties}->{particpantsRemoved},
+        participants_added   => $json->{properties}->{participantsAdded},
+        participants_removed => $json->{properties}->{participantsRemoved},
     };
 }
 

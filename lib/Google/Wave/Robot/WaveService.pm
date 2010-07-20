@@ -5,22 +5,42 @@ use 5.010;
 use warnings;
 use strict;
 
+use namespace::autoclean;
+
 use Moose;
 use MooseX::Method::Signatures;
 
+use Moose::Util::TypeConstraints;
+use MooseX::Types::LWP::UserAgent qw(UserAgent);
+
+BEGIN {
+    class_type "Google::Wave::Robot::Operation::Queue";
+}
+
 use LWP::UserAgent;
 use Net::OAuth 0.25;
+use Clone qw(clone);
 use JSON qw(encode_json decode_json);
 use Data::Random qw(rand_chars);
 
-use constant REQUEST_TOKEN_URL => q{https://www.google.com/accounts/OAuthGetRequestToken};
-use constant ACCESS_TOKEN_URL  => q{https://www.google.com/accounts/OAuthGetAccessToken};
-use constant AUTHORIZATION_URL => q{https://www.google.com/accounts/OAuthAuthorizeToken};
+use Carp;
 
-use constant SCOPE             => q{http://wave.googleusercontent.com/api/rpc};
+use constant {
+    REQUEST_TOKEN_URL => q{https://www.google.com/accounts/OAuthGetRequestToken},
+    ACCESS_TOKEN_URL  => q{https://www.google.com/accounts/OAuthGetAccessToken},
+    AUTHORIZATION_URL => q{https://www.google.com/accounts/OAuthAuthorizeToken},
 
-use constant RPC_URL           => q{https://www-opensocial.googleusercontent.com/api/rpc};
-use constant SANDBOX_RPC_URL   => q{https://www-opensocial-sandbox.googleusercontent.com/api/rpc};
+    SCOPE             => q{http://wave.googleusercontent.com/api/rpc},
+
+    RPC_URL           => q{https://www-opensocial.googleusercontent.com/api/rpc},
+    SANDBOX_RPC_URL   => q{https://www-opensocial-sandbox.googleusercontent.com/api/rpc},
+};
+
+has "ua" => (
+    is     => "rw",
+    isa    => UserAgent,
+    coerce => 1,
+);
 
 has "_server_rpc_base" => (
     is  => "rw",
@@ -37,16 +57,6 @@ has "_consumer_secret" => (
     isa => "Str",
 );
 
-has "_http_post" => (
-    is  => "rw",
-    isa => "CodeRef",
-);
-
-has "_ua" => (
-    is  => "rw",
-    isa => "LWP::UserAgent",
-);
-
 has "_access_token" => (
     is  => "rw",
     isa => "Str",
@@ -61,8 +71,8 @@ method BUILDARGS ( ClassName $class:
                    Bool      :$use_sandbox?, 
                    Str       :$server_rpc_base?, 
                    Str       :$consumer_key? = "anonymous", 
-                   Str       :$consumer_secret? = "anonymous", 
-                   CodeRef   :$http_post? ) {
+                   Str       :$consumer_secret? = "anonymous",
+                   UserAgent :$ua? ) {
 
     return {
         _server_rpc_base => $server_rpc_base ? $server_rpc_base :
@@ -72,11 +82,58 @@ method BUILDARGS ( ClassName $class:
         _consumer_key    => $consumer_key,
         _consumer_secret => $consumer_secret,
 
-        _http_post => $http_post // \&http_post,
-
-        _ua        => LWP::UserAgent->new,
+        ua               => $ua // [],
     };
 }
+
+method post_operation_queue ( Google::Wave::Robot::Operation::Queue $queue ) {
+    my $data = encode_json($queue->serialize(method_prefix => 'wave'));
+
+    my $oauth_req = Net::OAuth->request("protected resource")->new(
+        $self->_default_request_params("POST"),
+        request_url  => $self->_server_rpc_base,
+        token        => $self->_access_token,
+        token_secret => $self->_access_token_secret,
+    );
+    $oauth_req->sign;
+
+    my $headers = {
+        "Content-Type"  => "application/json",
+        "Authorization" => $oauth_req->to_authorization_header,
+    };
+
+    my $url = $self->_server_rpc_base;
+    my $res;
+    while (!$res) {
+        $res = $self->ua->post($url, %{$headers}, Content => $data);
+
+        if ($res->is_redirect) {
+            $url = $res->header("Location");
+            next;
+        }
+    }
+
+    my $status = $res->code;
+    croak "rpc error: ".$res->status_line."\n".$res->content if $status != 200;
+
+    return ($status, decode_json($res->content), $res);
+}
+
+method _default_request_params ( Str $method? = 'GET' ) {
+    return (
+        protocol_version => $Net::OAuth::PROTOCOL_VERSION_1_0A,
+        consumer_key     => $self->_consumer_key,
+        consumer_secret  => $self->_consumer_secret,
+        request_method   => $method,
+        signature_method => "HMAC-SHA1",
+        timestamp        => time,
+        nonce            => join('', rand_chars(size => 16, set => "alphanumeric"))
+    );
+}
+
+1;
+
+__END__
 
 =pod
 sub _make_token {
@@ -133,81 +190,6 @@ around "make_rpc" => sub {
 1;
 
 __END__
-
-sub make_rpc {
-    my $self = shift;
-
-    my %args = validate(@_, {
-        operations => {
-            callbacks => {
-                'Operation, list of Operations or Operation::Queue' => sub {
-                    my $value = shift;
-                    return 0 if !$value;
-                    return 1 if ref $value eq q{Google::Wave::Robot::Operation};
-                    return 1 if ref $value eq q{Google::Wave::Robot::Operation::Queue};
-                    return 0 if ref $value ne "ARRAY";
-                    return 0 if grep { ref $_ ne q{Google::Wave::Robot::Operation} } @$value;
-                    return 1;
-                },
-            },
-        },
-    });
-
-    my $queue;
-    given (ref $args{operations}) {
-        when (q{Google::Wave::Robot::Operation::Queue}) {
-            $queue = $args{operations};
-        }
-        when (q{Google::Wave::Robot::Operation}) {
-            $args{operations} = [$args{operations}];
-            continue;
-        }
-        default {
-            $queue = Google::Wave::Robot::Operation::Queue->new;
-            $queue->copy_operations($args{operations});
-        }
-    }
-
-    my $data = encode_json($queue->serialize({ method_prefix => 'wave' }));
-
-    my $oauth_req = Net::OAuth->request("protected resource")->new(
-        $self->_default_request_params("POST"),
-        request_url  => $self->{_server_rpc_base},
-        token        => $self->{_access_token},
-        token_secret => $self->{_access_token_secret},
-    );
-    $oauth_req->sign;
-
-    my $headers = {
-        "Content-Type"  => "application/json",
-        "Authorization" => $oauth_req->to_authorization_header,
-    };
-
-    my ($status, $content) = $self->{_http_post}->($self, {
-        url     => $self->{_server_rpc_base},
-        data    => $data,
-        headers => $headers,
-    });
-
-    croak "rpc error: $status\n$content" if $status != 200;   # XXX Error::RpcError
-
-    return decode_json($content);
-}
-
-sub _default_request_params {
-    my ($self, $method) = @_;
-    $method //= "GET";
-
-    return (
-        protocol_version => $Net::OAuth::PROTOCOL_VERSION_1_0A,
-        consumer_key     => $self->consumer_key,
-        consumer_secret  => $self->consumer_secret,
-        request_method   => $method,
-        signature_method => "HMAC-SHA1",
-        timestamp        => time,
-        nonce            => join('', rand_chars(size => 16, set => "alphanumeric"))
-    );
-}
 
 sub _first_rpc_result {
     my ($self, $result) = @_;

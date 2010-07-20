@@ -13,45 +13,45 @@ BEGIN {
     class_type 'Google::Wave::Robot::Wavelet';
 }
 
-has "json" => {
+has "json" => (
+    is  => "ro",
+    isa => "Str",
+);
+
+has "type" => (
     is  => "ro",
     isa => "Str",
 };
 
-has "type" => {
+has "modified_by" => (
     is  => "ro",
     isa => "Str",
-};
+);
 
-has "modified_by" => {
-    is  => "ro",
-    isa => "Str",
-};
-
-has "timestamp" => {
+has "timestamp" => (
     is  => "ro",
     isa => "Int",
-};
+);
 
-has "proxying_for" => {
+has "proxying_for" => (
     is  => "ro",
     isa => "Str",
-};
+);
 
-has "properties" => {
+has "properties" => (
     is  => "ro",
     isa => "HashRef",
-};
+);
 
-has "blip_id" => {
+has "blip_id" => (
     is  => "ro",
     isa => "Str",
-};
+);
 
-has "blip" => {
+has "blip" => (
     is  => "ro",
     isa => "Google::Wave::Robot::Blip",
-};
+);
 
 method BUILDARGS ( ClassName $class: JSON :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
     my $args = {

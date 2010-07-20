@@ -2,9 +2,6 @@ package Google::Wave::Robot::WaveService;
 
 use 5.010;
 
-use warnings;
-use strict;
-
 use namespace::autoclean;
 
 use Moose;

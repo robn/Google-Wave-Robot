@@ -7,7 +7,6 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 
-use MooseX::Types::JSON qw(JSON);
 use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
@@ -24,7 +23,7 @@ has "participants_removed" => (
     isa => "ArrayRef[Str]",
 );
 
-method BUILDARGS ( ClassName $class: JSON :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
+method BUILDARGS ( ClassName $class: HashRef :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
     return {
         participants_added   => $json->{properties}->{participantsAdded},
         participants_removed => $json->{properties}->{participantsRemoved},

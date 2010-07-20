@@ -7,7 +7,6 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 
-use MooseX::Types::JSON qw(JSON);
 use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
@@ -24,7 +23,7 @@ has "new_blip" => (
     isa => "Google::Wave::Robot::Blip",
 );
 
-method BUILDARGS ( ClassName $class: JSON :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
+method BUILDARGS ( ClassName $class: HashRef :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
     my $args;
 
     $args->{new_blip_id} = $json->{properties}->{newBlipId};

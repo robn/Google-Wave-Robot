@@ -7,7 +7,6 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 
-use MooseX::Types::JSON qw(JSON);
 use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
@@ -19,7 +18,7 @@ has "removed_blip_id" => (
     isa => "Str",
 );
 
-method BUILDARGS ( ClassName $class: JSON :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
+method BUILDARGS ( ClassName $class: HashRef :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
     return {
         removed_blip_id => $json->{properties}->{removedBlipId},
     };

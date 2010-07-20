@@ -7,7 +7,6 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 
-use MooseX::Types::JSON qw(JSON);
 use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");

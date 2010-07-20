@@ -15,9 +15,9 @@ sub on_wavelet_self_added {
 }
 
 my $robot = Google::Wave::Robot->new(
-    name       => "perly",
-    profileUrl => "http://www.perl.org/",
-    image_url  => "http://www.perl.org/i/icons/camel.png",
+    name        => "perly",
+    profile_url => "http://www.perl.org/",
+    image_url   => "http://www.perl.org/i/icons/camel.png",
 );
 
 $robot->register_handler("Google::Wave::Robot::Event::WaveletParticipantsChanged", \&on_wavelet_participants_changed);

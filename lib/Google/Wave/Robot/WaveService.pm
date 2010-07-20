@@ -89,12 +89,21 @@ method BUILDARGS ( ClassName $class:
 method post_operation_queue ( Google::Wave::Robot::Operation::Queue $queue ) {
     my $data = encode_json($queue->serialize(method_prefix => 'wave'));
 
-    my $oauth_req = Net::OAuth->request("protected resource")->new(
-        $self->_default_request_params("POST"),
-        request_url  => $self->_server_rpc_base,
-        token        => $self->_access_token,
-        token_secret => $self->_access_token_secret,
-    );
+    my $oauth_req;
+    if ($self->_access_token) {
+        $oauth_req = Net::OAuth->request("protected resource")->new(
+            $self->_default_request_params("POST"),
+            request_url  => $self->_server_rpc_base,
+            token        => $self->_access_token,
+            token_secret => $self->_access_token_secret,
+        );
+    }
+    else {
+        $oauth_req = Net::OAuth->request("consumer")->new(
+            $self->_default_request_params("POST"),
+            request_url     => $self->_server_rpc_base,
+        );
+    }
     $oauth_req->sign;
 
     my $headers = {

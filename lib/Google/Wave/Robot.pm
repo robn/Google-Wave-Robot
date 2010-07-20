@@ -16,7 +16,7 @@ method verification_token_info () {
 method setup_oauth () {
 }
 
-method register_handler () {
+method register_handler ( Str $event_class, CodeRef $handler ) {
 }
 
 method register_profile_handler () {

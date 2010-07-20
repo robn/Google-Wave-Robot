@@ -6,11 +6,8 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use Moose::Util::TypeConstraints;
 
-BEGIN {
-    class_type 'Google::Wave::Robot';
-}
+use Google::Wave::Robot::Types;
 
 method run ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
     given ($env->{REQUEST_URI}) {

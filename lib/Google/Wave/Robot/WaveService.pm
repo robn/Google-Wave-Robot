@@ -7,12 +7,8 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 
-use Moose::Util::TypeConstraints;
 use MooseX::Types::LWP::UserAgent qw(UserAgent);
-
-BEGIN {
-    class_type "Google::Wave::Robot::Operation::Queue";
-}
+use Google::Wave::Robot::Types;
 
 use LWP::UserAgent;
 use Net::OAuth 0.25;

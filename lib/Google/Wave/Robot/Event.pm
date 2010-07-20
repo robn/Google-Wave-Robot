@@ -6,12 +6,9 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use Moose::Util::TypeConstraints;
-use MooseX::Types::JSON qw(JSON);
 
-BEGIN {
-    class_type 'Google::Wave::Robot::Wavelet';
-}
+use MooseX::Types::JSON qw(JSON);
+use Google::Wave::Robot::Types;
 
 has "json" => (
     is  => "ro",
@@ -21,7 +18,7 @@ has "json" => (
 has "type" => (
     is  => "ro",
     isa => "Str",
-};
+);
 
 has "modified_by" => (
     is  => "ro",

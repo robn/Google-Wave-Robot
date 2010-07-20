@@ -81,7 +81,7 @@ method serialize ( Str :$method_prefix? = '' ) {
         },
     );
 
-    return [map { $_->serialize } ($notify, @{$self->_pending})];
+    return [map { $_->serialize(method_prefix => $method_prefix) } ($notify, @{$self->_pending})];
 }
 
 method new_operation ( Str :$method, Str :$wave_id?, Str :$wavelet_id?, HashRef :$params? = {}) {

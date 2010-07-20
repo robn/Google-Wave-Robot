@@ -52,7 +52,7 @@ has "params" => (
 );
 
 method serialize ( Str :$method_prefix? = '') {
-    $method_prefix += '.' if $method_prefix;
+    $method_prefix .= '.' if $method_prefix;
     return {
         method => $method_prefix.$self->method,
         id     => $self->id,

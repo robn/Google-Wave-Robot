@@ -1,4 +1,4 @@
-package Google::Wave::Event::WaveletBlipCreated;
+package Google::Wave::Robot::Event::WaveletBlipCreated;
 
 use 5.010;
 
@@ -10,7 +10,7 @@ use MooseX::Method::Signatures;
 use MooseX::Types::JSON qw(JSON);
 use Google::Wave::Robot::Types;
 
-extends ("Google::Wave::Event");
+extends ("Google::Wave::Robot::Event");
 
 use constant name => "WAVELET_BLIP_CREATED";
 

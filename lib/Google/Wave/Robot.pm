@@ -45,12 +45,12 @@ my $hash_func = sub {
 };
 
 # XXX include context and filter
-method register_handler ( Str $event_class, CodeRef $handler ) {
+method register_handler ( Str $event_class, CodeRef $callback ) {
     my $type = $event_class->type;
 
     $self->_handlers->{$type} = {
         event_class => $event_class,
-        handler     => $handler,
+        callback    => $callback,
         # XXX context
         # XXX filter
     };
@@ -82,7 +82,7 @@ method process_events ( JSON $json ) {
     for my $event_data (@{$parsed->{events}}) {
         if (my $handler = $self->_handlers->{$event_data->{type}}) {
             my $event = $handler->{event_class}->new($event_data, $event_wavelet);
-            $handler->{handler}->($event, $event_wavelet);
+            $handler->{callback}->($event, $event_wavelet);
         }
     }
 

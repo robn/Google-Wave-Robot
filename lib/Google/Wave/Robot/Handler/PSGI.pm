@@ -35,6 +35,14 @@ method profiles_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef 
 }
 
 method rpc_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
+    my $json = '';
+    while ($env->{'psgi.input'}->read(my $buf, 4096)) {
+        $json .= $buf;
+    };
+
+    $robot->process_events($json);
+
+    # XXX send the response
 }
 
 method verify_token_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {

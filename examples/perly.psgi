@@ -9,9 +9,11 @@ use Google::Wave::Robot;
 use Google::Wave::Robot::Handler::PSGI;
 
 sub on_wavelet_participants_changed {
+    my ($event, $wavelet) = @_;
 }
 
 sub on_wavelet_self_added {
+    my ($event, $wavelet) = @_;
 }
 
 my $robot = Google::Wave::Robot->new(

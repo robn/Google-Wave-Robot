@@ -9,6 +9,25 @@ use MooseX::Method::Signatures;
 
 use Google::Wave::Robot::Types;
 
+# load event classes as a convenience to the caller
+use Google::Wave::Robot::Event::AnnotatedTextChanged;
+use Google::Wave::Robot::Event::BlipContributorsChanged;
+use Google::Wave::Robot::Event::BlipSubmitted;
+use Google::Wave::Robot::Event::DocumentChanged;
+use Google::Wave::Robot::Event::FormButtonClicked;
+use Google::Wave::Robot::Event::GadgetStateChanged;
+use Google::Wave::Robot::Event::OperationError;
+use Google::Wave::Robot::Event::WaveletBlipCreated;
+use Google::Wave::Robot::Event::WaveletBlipRemoved;
+use Google::Wave::Robot::Event::WaveletCreated;
+use Google::Wave::Robot::Event::WaveletFetched;
+use Google::Wave::Robot::Event::WaveletParticipantsChanged;
+use Google::Wave::Robot::Event::WaveletSelfAdded;
+use Google::Wave::Robot::Event::WaveletSelfRemoved;
+use Google::Wave::Robot::Event::WaveletTagsChanged;
+use Google::Wave::Robot::Event::WaveletTitleChanged;
+use Google::Wave::Robot::Event::Context;
+
 has "json" => (
     is  => "ro",
     isa => "Str",

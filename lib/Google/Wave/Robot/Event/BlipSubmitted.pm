@@ -6,15 +6,16 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
+use MooseX::ClassAttribute;
 
 use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-has "type" => (
-    is      => "ro",
-    isa     => "Str",
-    default => "BLIP_SUBMITTED",
+class_has "type" => (
+    is       => "ro",
+    isa      => "Str",
+    default  => "BLIP_SUBMITTED",
     init_arg => undef,
 );
 

@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "DOCUMENT_CHANGED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "DOCUMENT_CHANGED",
+    init_arg => undef,
+);
 
 __PACKAGE__->meta->make_immutable;
 

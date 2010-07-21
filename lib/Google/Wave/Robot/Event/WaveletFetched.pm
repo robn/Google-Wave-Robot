@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "WAVELET_FETCHED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "WAVELET_FETCHED",
+    init_arg => undef,
+);
 
 has "message" => (
     is  => "ro",

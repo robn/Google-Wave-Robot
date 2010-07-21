@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "BLIP_CONTRIBUTORS_CHANGED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "BLIP_CONTRIBUTORS_CHANGED",
+    init_arg => undef,
+);
 
 has "contributors_added" => (
     is  => "ro",

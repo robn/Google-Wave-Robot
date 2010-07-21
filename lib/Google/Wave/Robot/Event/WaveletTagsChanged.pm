@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "WAVELET_TAGS_CHANGED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "WAVELET_TAGS_CHANGED",
+    init_arg => undef,
+);
 
 __PACKAGE__->meta->make_immutable;
 

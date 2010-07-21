@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "OPERATION_ERROR";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "OPERATION_ERROR",
+    init_arg => undef,
+);
 
 has "operation_id" => (
     is  => "ro",

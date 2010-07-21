@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "WAVELET_PARTICIPANTS_CHANGED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "WAVELET_PARTICIPANTS_CHANGED",
+    init_arg => undef,
+);
 
 has "participants_added" => (
     is  => "ro",

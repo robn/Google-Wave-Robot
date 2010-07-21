@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "GADGET_STATE_CHANGED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "GADGET_STATE_CHANGED",
+    init_arg => undef,
+);
 
 has "index" => (
     is  => "ro",

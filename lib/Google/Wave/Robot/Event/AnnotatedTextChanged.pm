@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "ANNOTATED_TEXT_CHAGED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "ANNOTATED_TEXT_CHANGED",
+    init_arg => undef,
+);
 
 has "name" => (
     is  => "ro",

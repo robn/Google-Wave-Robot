@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "WAVELET_BLIP_CREATED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "WAVELET_BLIP_CREATED",
+    init_arg => undef,
+);
 
 has "new_blip_id" => (
     is  => "ro",

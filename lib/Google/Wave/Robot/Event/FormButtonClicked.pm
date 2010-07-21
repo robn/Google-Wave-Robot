@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "FORM_BUTTON_CLICKED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "FORM_BUTTON_CLICKED",
+    init_arg => undef,
+);
 
 has "button_name" => (
     is  => "ro",

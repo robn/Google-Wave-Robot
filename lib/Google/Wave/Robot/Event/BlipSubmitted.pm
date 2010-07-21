@@ -11,7 +11,12 @@ use Google::Wave::Robot::Types;
 
 extends ("Google::Wave::Robot::Event");
 
-use constant name => "BLIP_SUBMITTED";
+has "type" => (
+    is      => "ro",
+    isa     => "Str",
+    default => "BLIP_SUBMITTED",
+    init_arg => undef,
+);
 
 __PACKAGE__->meta->make_immutable;
 

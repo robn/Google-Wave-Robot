@@ -12,32 +12,32 @@ use Google::Wave::Robot::Types;
 method run ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
     given ($env->{REQUEST_URI}) {
         when (m{/_wave/capabilities.xml$}) {
-            return $class->capabilities_handler($robot);
+            return $class->capabilities_handler($robot, $env);
         }
         when (m{/_wave/robot/profile$}) {
-            return $class->profiles_handler($robot);
+            return $class->profiles_handler($robot, $env);
         }
         when (m{/_wave/robot/jsonrpc$}) {
-            return $class->rpc_handler($robot);
+            return $class->rpc_handler($robot, $env);
         }
         when (m{/_wave/verify_token$}) {
-            return $class->verify_token_handler($robot);
+            return $class->verify_token_handler($robot, $env);
         }
     }
 
     return $class->unknown_handler;
 }
 
-method capabilities_handler ( ClassName $class: Google::Wave::Robot $robot ) {
+method capabilities_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
 }
 
-method profiles_handler ( ClassName $class: Google::Wave::Robot $robot ) {
+method profiles_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
 }
 
-method rpc_handler ( ClassName $class: Google::Wave::Robot $robot ) {
+method rpc_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
 }
 
-method verify_token_handler ( ClassName $class: Google::Wave::Robot $robot ) {
+method verify_token_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
 }
 
 method unknown_handler ( ClassName $class: ) {

@@ -4,16 +4,15 @@ use 5.010;
 
 use namespace::autoclean;
 
-use Moose;
-use Moose::Util::TypeConstraints;
+use MooseX::Types -declare => [qw(
+    Robot Wavelet Blip Operation OperationQueue
+)];
 
-class_type 'Google::Wave::Robot';
-class_type 'Google::Wave::Robot::Wavelet';
-class_type 'Google::Wave::Robot::Blip';
-class_type 'Google::Wave::Robot::Operation';
-class_type 'Google::Wave::Robot::Operation::Queue';
-
-__PACKAGE__->meta->make_immutable;
+class_type Robot,          { class => 'Google::Wave::Robot' };
+class_type Wavelet,        { class => 'Google::Wave::Robot::Wavelet' };
+class_type Blip,           { class => 'Google::Wave::Robot::Blip' };
+class_type Operation,      { class => 'Google::Wave::Robot::Operation' };
+class_type OperationQueue, { class => 'Google::Wave::Robot::Operation::Queue' };
 
 1;
 

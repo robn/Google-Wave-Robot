@@ -212,8 +212,8 @@ method wavelet_modify_tag ( Str :$wave_id, Str :$wavelet_id, Str :$tag, Str :$mo
         wave_id    => $wave_id,
         wavelet_id => $wavelet_id,
         params     => {
-            name       => $tag,
-            modify_how => $modify_how,  # XXX should this be modifyHow? bug in python cl?
+            name      => $tag,
+            modifyHow => $modify_how,
         },
     );
 }

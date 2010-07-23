@@ -10,33 +10,55 @@ use MooseX::Types::Moose qw(Str HashRef ArrayRef Object);
 use Google::Wave::Robot::Types qw(Blip OperationQueue);
 
 has "wavelet_id" => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has "wave_id" => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has "creator" => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has "creation_time" => (
+    is       => "ro",
+    isa      => Str,
+    required => 1,
+);
+
+has "last_modified_time" => (
+    is       => "ro",
+    isa      => Str,
+    required => 1,
+);
+
+has "title" => (
+    is       => "rw",
+    isa      => Str,  # XXX hook setter to call set_title and adjust the content
+    default  => '',
+);
+
+has "operation_queue" => (
+    is       => "ro",
+    isa      => OperationQueue,
+    required => 1,
+);
+
+has "robot_address" => (
     is  => "ro",
-    isa => Str,
+    isa => Str,  # XXX can't be set if already set
 );
 
 has "data_documents" => (
     is  => "ro",
     isa => HashRef[Str],    # XXX key/value pairs, needs some handlers that hook DATADOC_SET
-);
-
-has "last_modified_time" => (
-    is  => "ro",
-    isa => Str,
 );
 
 has "participants" => (
@@ -52,30 +74,43 @@ has "root_thread" => (
 
 has "tags" => (
     is  => "ro",
-    isa => ArrayRef[Str], # list of tags, needs handlers that hook MODIFY_TAG
+    isa => ArrayRef[Str], # XXX list of tags, needs handlers that hook MODIFY_TAG
 );
 
-has "title" => (
-    is  => "rw",
-    isa => Str,  # XXX hook setter to call set_title and adjust the content
-);
-
-has "robot_address" => (
-    is  => "ro",
-    isa => Str,  # XXX can't be set if already set
+has "root_blip_id" => (
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has "root_blip" => (
-    is  => "ro",
-    isa => Blip,
+    is       => "ro",
+    isa      => Blip,
+    # XXX required => 1,
 );
 
-has "operation_queue" => (
-    is  => "ro",
-    isa => OperationQueue,
-);
+method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue? ) {
+    my $args = {};
 
-method new_from_json ( HashRef :$json, OperationQueue :$operation_queue ) {
+    $args->{operation_queue} = $operation_queue || Google::Wave::Robot::Operation::Queue->new;
+
+    my $wavelet_data = $json->{wavelet} || $json->{waveletData} || $json;
+    $args->{wavelet_id}         = $wavelet_data->{waveletId};
+    $args->{wave_id}            = $wavelet_data->{waveId};
+    $args->{creator}            = $wavelet_data->{creator};
+    $args->{creation_time}      = $wavelet_data->{creationTime};
+    $args->{last_modified_time} = $wavelet_data->{lastModifiedTime};
+    $args->{title}              = $wavelet_data->{title} // '';
+    $args->{root_blip_id}       = $wavelet_data->{rootBlipId};
+
+    # XXX do blips, threads
+
+    $args->{robot_address} = $json->{robotAddress} if exists $json->{robotAddress};
+
+    use Data::Dumper;
+    print Dumper $args;
+
+    return $args;
 }
 
 method serialize () {

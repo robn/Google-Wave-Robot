@@ -6,6 +6,8 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
+use MooseX::Types::Moose qw(Str ArrayRef);
+use Google::Wave::Robot::Types qw(Operation);
 
 use Google::Wave::Robot::Operation;
 
@@ -15,13 +17,13 @@ my $next_operation_id = 1;
 
 has "capabilities_hash" => (
     is  => "rw",
-    isa => "Str"
+    isa => Str,
 );
 
 has "_pending" => (
     traits  => ["Array"],
     is      => "rw",
-    isa     => "ArrayRef[Google::Wave::Robot::Operation]",
+    isa     => ArrayRef[Operation],
     default => sub { [] },
     handles => {
         push => 'push',
@@ -30,7 +32,7 @@ has "_pending" => (
 
 has "_proxy_for_id" => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 method _new_blip_data ( Str :$wave_id,

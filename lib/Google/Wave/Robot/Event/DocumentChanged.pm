@@ -7,14 +7,13 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
-
-use Google::Wave::Robot::Types;
+use MooseX::Types::Moose qw(Str);
 
 extends ("Google::Wave::Robot::Event");
 
 class_has "type" => (
     is       => "ro",
-    isa      => "Str",
+    isa      => Str,
     default  => "DOCUMENT_CHANGED",
     init_arg => undef,
 );

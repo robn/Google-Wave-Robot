@@ -6,9 +6,9 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-
+use MooseX::Types::Moose qw(Str);
 use MooseX::Types::LWP::UserAgent qw(UserAgent);
-use Google::Wave::Robot::Types;
+use Google::Wave::Robot::Types qw(OperationQueue);
 
 use LWP::UserAgent;
 use Net::OAuth 0.25;
@@ -37,27 +37,27 @@ has "ua" => (
 
 has "_server_rpc_base" => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 has "_consumer_key" => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 has "_consumer_secret" => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 has "_access_token" => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 has "_access_token_secret" => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 method BUILDARGS ( ClassName $class:
@@ -79,7 +79,7 @@ method BUILDARGS ( ClassName $class:
     };
 }
 
-method post_operation_queue ( Google::Wave::Robot::Operation::Queue $queue ) {
+method post_operation_queue ( OperationQueue $queue ) {
     my $data = encode_json($queue->serialize(method_prefix => 'wave'));
 
     my $oauth_req;

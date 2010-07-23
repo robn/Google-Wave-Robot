@@ -6,10 +6,9 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
+use Google::Wave::Robot::Types qw(Robot);
 
-use Google::Wave::Robot::Types;
-
-method run ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
+method run ( ClassName $class: Robot $robot, HashRef $env ) {
     given ($env->{REQUEST_URI}) {
         when (m{/_wave/capabilities.xml$}) {
             return $class->capabilities_handler($robot, $env);
@@ -28,13 +27,13 @@ method run ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
     return $class->unknown_handler;
 }
 
-method capabilities_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
+method capabilities_handler ( ClassName $class: Robot $robot, HashRef $env ) {
 }
 
-method profiles_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
+method profiles_handler ( ClassName $class: Robot $robot, HashRef $env ) {
 }
 
-method rpc_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
+method rpc_handler ( ClassName $class: Robot $robot, HashRef $env ) {
     my $json = '';
     while ($env->{'psgi.input'}->read(my $buf, 4096)) {
         $json .= $buf;
@@ -45,7 +44,7 @@ method rpc_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env 
     # XXX send the response
 }
 
-method verify_token_handler ( ClassName $class: Google::Wave::Robot $robot, HashRef $env ) {
+method verify_token_handler ( ClassName $class: Robot $robot, HashRef $env ) {
 }
 
 method unknown_handler ( ClassName $class: ) {

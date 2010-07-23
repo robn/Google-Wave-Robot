@@ -6,8 +6,8 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-
-use Google::Wave::Robot::Types;
+use MooseX::Types::Moose qw(Str Int HashRef);
+use Google::Wave::Robot::Types qw(Blip Wavelet);
 
 # load event classes as a convenience to the caller
 use Google::Wave::Robot::Event::AnnotatedTextChanged;
@@ -30,45 +30,45 @@ use Google::Wave::Robot::Event::Context;
 
 has "json" => (
     is  => "ro",
-    isa => "Str",
+    isa => Str,
 );
 
 has "type" => (
     is  => "ro",
-    isa => "Str",
+    isa => Str,
 );
 
 has "modified_by" => (
     is  => "ro",
-    isa => "Str",
+    isa => Str,
 );
 
 has "timestamp" => (
     is  => "ro",
-    isa => "Int",
+    isa => Int,
 );
 
 has "proxying_for" => (
     is  => "ro",
-    isa => "Str",
+    isa => Str,
 );
 
 has "properties" => (
     is  => "ro",
-    isa => "HashRef",
+    isa => HashRef,
 );
 
 has "blip_id" => (
     is  => "ro",
-    isa => "Str",
+    isa => Str,
 );
 
 has "blip" => (
     is  => "ro",
-    isa => "Google::Wave::Robot::Blip",
+    isa => Blip,
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
+method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
     my $args = {
         json         => $json,
         type         => $json->{type},

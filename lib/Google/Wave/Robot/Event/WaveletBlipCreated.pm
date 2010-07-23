@@ -7,29 +7,29 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
-
-use Google::Wave::Robot::Types;
+use MooseX::Types::Moose qw(Str);
+use Google::Wave::Robot::Types qw(Wavelet Blip);
 
 extends ("Google::Wave::Robot::Event");
 
 class_has "type" => (
     is       => "ro",
-    isa      => "Str",
+    isa      => Str,
     default  => "WAVELET_BLIP_CREATED",
     init_arg => undef,
 );
 
 has "new_blip_id" => (
     is  => "ro",
-    isa => "Str",
+    isa => Str,
 );
 
 has "new_blip" => (
     is  => "ro",
-    isa => "Google::Wave::Robot::Blip",
+    isa => Blip,
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, Google::Wave::Robot::Wavelet :$wavelet ) {
+method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
     my $args;
 
     $args->{new_blip_id} = $json->{properties}->{newBlipId};

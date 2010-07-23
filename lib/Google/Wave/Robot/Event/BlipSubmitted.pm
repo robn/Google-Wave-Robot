@@ -7,8 +7,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
-
-use Google::Wave::Robot::Types;
+use MooseX::Types::Moose qw(Str);
 
 extends ("Google::Wave::Robot::Event");
 

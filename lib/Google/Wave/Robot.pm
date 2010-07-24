@@ -33,6 +33,16 @@ has "capabilities_hash" => (
     default => 0,
 );
 
+has _consumer_key => (
+    is  => "rw",
+    isa => "Str",
+);
+
+has _consumer_secret => (
+    is  => "rw",
+    isa => "Str",
+);
+
 method verification_token_info () {
 }
 
@@ -68,6 +78,32 @@ method register_profile_handler () {
 }
 
 method capabilities_xml () {
+    my $xml =
+        q{<?xml version="1.0"?>}.
+        q{<w:robot xmlns:w="http://wave.google.com/extensions/robots/1.0">}.
+            q{<w:version>}.$self->capabilities_hash.q{</w:version>}.
+            q{<w:protocolversion>}.Google::Wave::Robot::Operation::PROTOCOL_VERSION.q{</w:protocolversion>};
+
+    if ($self->_consumer_key) {
+        $xml .= q{<w:consumer_key>}.$self->_consumer_key.q{</w:consumer_key>};
+    }
+
+    if (keys %{$self->_handlers}) {
+        my $handlers = $self->_handlers;
+
+        $xml .= q{<w:capabilities>};
+
+        for my $capability (keys %$handlers) {
+            $xml .= q{<w:capability name='}.$capability.q{'/>};
+            # XXX contexts & filters
+        }
+
+        $xml .= q{</w:capabilities>};
+    }
+
+    $xml .= q{</w:robot>};
+
+    return $xml;
 }
 
 method process_events ( JSON $json ) {

@@ -154,7 +154,20 @@ method add_proxying_participant ( Str $proxy_id ) {
 method submit_with () {
 }
 
-method reply () {
+method reply ( Str $text? = "\n" ) {
+    # XXX text = util.force_unicode(text)
+    
+    my $blip_data = $self->operation_queue->wavelet_append_blip(
+        wave_id         => $self->wave_id,
+        wavelet_id      => $self->wavelet_id,
+        initial_content => $text,
+    );
+    my $blip = Google::Wave::Robot::Blip->new(
+        json            => $blip_data,
+        operation_queue => $self->operation_queue,
+        other_blips     => $self->blips,
+    );
+    $self->blips->add($blip->blip_id, $blip);
 }
 
 method delete () {

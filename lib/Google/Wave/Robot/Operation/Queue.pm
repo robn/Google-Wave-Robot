@@ -44,7 +44,7 @@ method _new_blip_data ( Str :$wave_id,
 
     return {
         waveId       => $wave_id,
-        wavletId     => $wavelet_id,
+        waveletId    => $wavelet_id,
         blipId       => $blip_id,
         content      => $initial_content,
         parentBlipId => $parent_blip_id,

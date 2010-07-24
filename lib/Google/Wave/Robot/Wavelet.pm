@@ -9,6 +9,9 @@ use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str HashRef ArrayRef Object);
 use Google::Wave::Robot::Types qw(Blip OperationQueue);
 
+use Google::Wave::Robot::Blip;
+use Google::Wave::Robot::Operation::Queue;
+
 has "wavelet_id" => (
     is       => "ro",
     isa      => Str,
@@ -103,7 +106,16 @@ method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_
     $args->{title}              = $wavelet_data->{title} // '';
     $args->{root_blip_id}       = $wavelet_data->{rootBlipId};
 
-    # XXX do blips, threads
+    my @blips;
+    @blips = map {
+        Google::Wave::Robot::Blip->new(
+            json            => $_,
+            operation_queue => $args->{operation_queue}, 
+            other_blips     => \@blips,
+        );
+    } values %{$json->{blips}};
+    
+    # XXX do threads
 
     $args->{robot_address} = $json->{robotAddress} if exists $json->{robotAddress};
 

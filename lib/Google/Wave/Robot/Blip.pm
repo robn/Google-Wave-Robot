@@ -9,6 +9,8 @@ use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str HashRef ArrayRef);
 use Google::Wave::Robot::Types qw(OperationQueue Blip);
 
+use Google::Wave::Robot::Operation::Queue;
+
 has blip_id => (
     is       => "ro",
     isa      => Str,
@@ -28,15 +30,13 @@ has wave_id => (
 );
 
 has parent_blip_id => (
-    is       => "ro",
-    isa      => Str,
-    required => 1,
+    is  => "ro",
+    isa => Str,
 );
 
 has child_blip_ids => (
-    is       => "ro",
-    isa      => Str,
-    required => 1,
+    is  => "ro",
+    isa => ArrayRef[Str],
 );
 
 has creator => (
@@ -69,9 +69,15 @@ has text => (
     required => 1,
 );
 
-has annotations => (
+has operation_queue => (
     is       => "ro",
-    isa      => ArrayRef,   # XXX ArrayRef[Annotation]
+    isa      => OperationQueue,
+    required => 1,
+);
+
+has annotations => (
+    is  => "ro",
+    isa => ArrayRef,   # XXX ArrayRef[Annotation]
 );
 
 has elements => (
@@ -79,16 +85,23 @@ has elements => (
     isa      => ArrayRef,   # XXX ArrayRef[Elements]
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue?, ArrayRef[Blip] :$other_blips )
+has other_blips => (
+    is      => "ro",
+    isa     => ArrayRef[Blip],
+    default => sub { [] },
+);
+
+method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue?, ArrayRef[Blip] :$other_blips? )
 {
     my $args = {};
 
     $args->{operation_queue} = $operation_queue || Google::Wave::Robot::Operation::Queue->new;
+    $args->{other_blips} = $other_blips if $other_blips;
 
     $args->{blip_id}            = $json->{blipId};
     $args->{wavelet_id}         = $json->{waveletId};
     $args->{wave_id}            = $json->{waveId};
-    $args->{parent_blip_id}     = $json->{parentBlipId};
+    $args->{parent_blip_id}     = $json->{parentBlipId} if defined $json->{parentBlipId};
     $args->{child_blip_ids}     = $json->{childBlipIds};
     $args->{creator}            = $json->{creator};
     $args->{contributors}       = $json->{contributors};

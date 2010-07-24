@@ -169,7 +169,7 @@ method process_events ( JSON $json ) {
 
     for my $event_data (@{$parsed->{events}}) {
         if (my $handler = $self->_handlers->{$event_data->{type}}) {
-            my $event = $handler->{event_class}->new($event_data, $event_wavelet);
+            my $event = $handler->{event_class}->new(json => $event_data, wavelet => $event_wavelet);
             $handler->{callback}->($event, $event_wavelet);
         }
     }

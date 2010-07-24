@@ -41,9 +41,7 @@ method rpc_handler ( ClassName $class: Robot $robot, HashRef $env ) {
         $json .= $buf;
     };
 
-    $robot->process_events($json);
-
-    # XXX send the response
+    return $class->_output(200, 'application/json', $robot->process_events($json));
 }
 
 method verify_token_handler ( ClassName $class: Robot $robot, HashRef $env ) {

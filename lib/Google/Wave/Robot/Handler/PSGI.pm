@@ -28,6 +28,7 @@ method run ( ClassName $class: Robot $robot, HashRef $env ) {
 }
 
 method capabilities_handler ( ClassName $class: Robot $robot, HashRef $env ) {
+    return [ 200, [ 'Content-type' => 'text/xml', Pragma => 'no-cache' ], [ $robot->capabilities_xml ] ];
 }
 
 method profiles_handler ( ClassName $class: Robot $robot, HashRef $env ) {

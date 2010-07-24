@@ -32,6 +32,7 @@ method capabilities_handler ( ClassName $class: Robot $robot, HashRef $env ) {
 }
 
 method profiles_handler ( ClassName $class: Robot $robot, HashRef $env ) {
+    return [ 200, [ 'Content-type' => 'application/json', Pragma => 'no-cache' ], [ $robot->profile_json ] ];
 }
 
 method rpc_handler ( ClassName $class: Robot $robot, HashRef $env ) {

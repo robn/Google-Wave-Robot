@@ -107,9 +107,6 @@ method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_
 
     $args->{robot_address} = $json->{robotAddress} if exists $json->{robotAddress};
 
-    use Data::Dumper;
-    print Dumper $args;
-
     return $args;
 }
 

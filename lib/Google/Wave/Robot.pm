@@ -52,6 +52,17 @@ has profile_handler => (
     isa => CodeRef,
 );
 
+has verification_token => (
+    is       => "ro",
+    isa      => Str,
+    required => 1,
+);
+
+has security_token => (
+    is  => "ro",
+    isa => Str,
+);
+
 has _consumer_key => (
     is  => "rw",
     isa => Str,

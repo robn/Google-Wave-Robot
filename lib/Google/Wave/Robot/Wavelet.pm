@@ -86,10 +86,10 @@ has root_blip_id => (
     required => 1,
 );
 
-has root_blip => (
-    is       => "ro",
-    isa      => Blip,
-    # XXX required => 1,
+has _other_blips => (
+    is      => "ro",
+    isa     => HashRef[Blip],
+    default => sub { {} },
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue? ) {
@@ -114,12 +114,22 @@ method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_
             other_blips     => \@blips,
         );
     } values %{$json->{blips}};
+
+    %{$args->{_other_blips}} = map { $_->blip_id => $_ } @blips;
     
     # XXX do threads
 
     $args->{robot_address} = $json->{robotAddress} if exists $json->{robotAddress};
 
     return $args;
+}
+
+method blip ( Str $blip_id ) {
+    return $self->_other_blips->{$blip_id};
+}
+
+method root_blip () {
+    return $self->blip($self->root_blip_id);
 }
 
 method serialize () {

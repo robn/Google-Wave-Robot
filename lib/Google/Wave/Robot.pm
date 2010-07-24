@@ -9,9 +9,8 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
+use MooseX::Types::Moose qw(Str Int HashRef);
 use MooseX::Types::JSON qw(JSON);
-
-use Google::Wave::Robot::Types;
 
 use Google::Wave::Robot::Event;
 use Google::Wave::Robot::Operation;
@@ -22,25 +21,25 @@ use JSON qw(encode_json decode_json);
 
 has "_handlers" => (
     is      => "rw",
-    isa     => "HashRef",
+    isa     => HashRef,
     default => sub { {} },
 );
 
 has "capabilities_hash" => (
     is      => "ro",
-    isa     => "Int",
+    isa     => Int,
     writer  => "_set_capabilities_hash",
     default => 0,
 );
 
 has _consumer_key => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 has _consumer_secret => (
     is  => "rw",
-    isa => "Str",
+    isa => Str,
 );
 
 method verification_token_info () {

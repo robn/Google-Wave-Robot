@@ -30,13 +30,19 @@ use Google::Wave::Robot::Event::Context;
 
 has json => (
     is       => "ro",
-    isa      => Str,
+    isa      => HashRef,
     required => 1,
 );
 
 has type => (
     is       => "ro",
     isa      => Str,
+    required => 1,
+);
+
+has wavelet => (
+    is       => "ro",
+    isa      => Wavelet,
     required => 1,
 );
 
@@ -65,29 +71,28 @@ has blip_id => (
     isa => Str,
 );
 
-has blip => (
-    is  => "ro",
-    isa => Blip,
-);
-
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    print STDERR "so I'm, like, here\n";
+    my $args = {};
 
-    my $args = {
-        json         => $json,
-        type         => $json->{type},
-        modified_by  => $json->{modifiedBy},
-        timestamp    => $json->{timestamp} || 0,
-        proxying_for => $json->{proxyingFor},
-    };
+    $args->{json}    = $json;
+    $args->{wavelet} = $wavelet;
+
+    $args->{type}         = $json->{type};
+    $args->{modified_by}  = $json->{modifiedBy};
+    $args->{timestamp}    = $json->{timestamp} || 0;
+    $args->{proxying_for} = $json->{proxyingFor} if defined $json->{proxyingFor};
 
     if ($json->{properties}) {
         $args->{properties} = $json->{properties};
-        $args->{blip_id}    = $json->{properties}->{blipId}    if exists $json->{properties}->{blipId};
-        $args->{blip}       = $wavelet->blip($args->{blip_id}) if exists $args->{blip_id};
+        $args->{blip_id}    = $json->{properties}->{blipId} if exists $json->{properties}->{blipId};
     }
 
     return $args;
+}
+
+method blip () {
+    return if !$self->blip_id;
+    return $self->wavelet->blip($self->blip_id);
 }
 
 __PACKAGE__->meta->make_immutable;

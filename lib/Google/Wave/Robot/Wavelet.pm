@@ -13,6 +13,8 @@ use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
 
+use Carp;
+
 has wavelet_id => (
     is       => "ro",
     isa      => Str,
@@ -137,7 +139,16 @@ method serialize () {
 method proxy_for () {
 }
 
-method add_proxying_participant () {
+method add_proxying_participant ( Str $proxy_id ) {
+    croak "need a robot address to add a proxying participant" if !$self->robot_address;
+
+    # robotid+proxy#version@domain
+    my ($robot_id, $old_proxy_id, $version, $domain) = $self->robot_address =~ m/^([^+#@]+)(?:\+([^#@]+))?(?:\#([^@]+))?\@(.*)$/;
+
+    my $new_id = sprintf q{%s+%s%s@%s}, $robot_id, $proxy_id, $version ? "#$version" : '', $domain;
+
+    # XXX $self->participants->add($new_id);
+    $self->operation_queue->wavelet_add_participant(wave_id => $self->wave_id, wavelet_id => $self->wavelet_id, participant_id => $new_id);
 }
 
 method submit_with () {

@@ -7,8 +7,9 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str HashRef ArrayRef);
-use Google::Wave::Robot::Types qw(OperationQueue Blip);
+use Google::Wave::Robot::Types qw(BlipSet OperationQueue Blip);
 
+use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
 
 has blip_id => (
@@ -85,18 +86,18 @@ has elements => (
     isa      => ArrayRef,   # XXX ArrayRef[Elements]
 );
 
-has other_blips => (
+has _other_blips => (
     is      => "ro",
-    isa     => ArrayRef[Blip],
-    default => sub { [] },
+    isa     => BlipSet,
+    default => sub { Google::Wave::Robot::Blip::Set->new },
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue?, ArrayRef[Blip] :$other_blips? )
+method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue?, BlipSet :$other_blips? )
 {
     my $args = {};
 
     $args->{operation_queue} = $operation_queue || Google::Wave::Robot::Operation::Queue->new;
-    $args->{other_blips} = $other_blips if $other_blips;
+    $args->{_other_blips} = $other_blips if $other_blips;
 
     $args->{blip_id}            = $json->{blipId};
     $args->{wavelet_id}         = $json->{waveletId};

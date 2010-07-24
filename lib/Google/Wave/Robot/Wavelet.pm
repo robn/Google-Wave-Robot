@@ -7,9 +7,10 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str HashRef ArrayRef Object);
-use Google::Wave::Robot::Types qw(Blip OperationQueue);
+use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue);
 
 use Google::Wave::Robot::Blip;
+use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
 
 has wavelet_id => (
@@ -86,10 +87,12 @@ has root_blip_id => (
     required => 1,
 );
 
-has _other_blips => (
+has blips => (
     is      => "ro",
-    isa     => HashRef[Blip],
-    default => sub { {} },
+    isa     => BlipSet,
+    handles => {
+        blip => 'get',
+    },
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue? ) {
@@ -106,26 +109,22 @@ method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_
     $args->{title}              = $wavelet_data->{title} // '';
     $args->{root_blip_id}       = $wavelet_data->{rootBlipId};
 
-    my @blips;
-    @blips = map {
-        Google::Wave::Robot::Blip->new(
-            json            => $_,
-            operation_queue => $args->{operation_queue}, 
-            other_blips     => \@blips,
-        );
-    } values %{$json->{blips}};
+    $args->{blips} = Google::Wave::Robot::Blip::Set->new;
 
-    %{$args->{_other_blips}} = map { $_->blip_id => $_ } @blips;
+    for my $blip_data (values %{$json->{blips}}) {
+        my $blip = Google::Wave::Robot::Blip->new(
+            json            => $blip_data,
+            operation_queue => $args->{operation_queue}, 
+            other_blips     => $args->{blips},
+        );
+        $args->{blips}->add($blip->blip_id, $blip);
+    }
     
     # XXX do threads
 
     $args->{robot_address} = $json->{robotAddress} if exists $json->{robotAddress};
 
     return $args;
-}
-
-method blip ( Str $blip_id ) {
-    return $self->_other_blips->{$blip_id};
 }
 
 method root_blip () {

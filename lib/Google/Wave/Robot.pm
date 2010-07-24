@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Str Int HashRef);
+use MooseX::Types::Moose qw(Str Int HashRef CodeRef);
 use MooseX::Types::JSON qw(JSON);
 
 use Google::Wave::Robot::Event;
@@ -32,6 +32,26 @@ has "capabilities_hash" => (
     default => 0,
 );
 
+has name => (
+    is  => "ro",
+    isa => Str,
+);
+
+has profile_url => (
+    is  => "ro",
+    isa => Str,
+);
+
+has image_url => (
+    is  => "ro",
+    isa => Str,
+);
+
+has profile_handler => (
+    is  => "ro",
+    isa => CodeRef,
+);
+
 has _consumer_key => (
     is  => "rw",
     isa => Str,
@@ -41,6 +61,23 @@ has _consumer_secret => (
     is  => "rw",
     isa => Str,
 );
+
+method _profile_sanity_check () {
+    if ($self->profile_handler) {
+        if ($self->name || $self->profile_url || $self->image_url) {
+            confess "may not specify profile_handler with name/profile_url/image_url";
+        }
+    }
+    else {
+        if (!($self->name && $self->profile_url && $self->image_url)) {
+            confess "must specify name/profile_url/image_url or profile_handler";
+        }
+    }
+}
+
+method BUILD {
+    $self->_profile_sanity_check;
+}
 
 method verification_token_info () {
 }
@@ -73,9 +110,6 @@ method register_handler ( Str $event_class, CodeRef $callback ) {
     ) & 0xfffffff);
 }
 
-method register_profile_handler () {
-}
-
 method capabilities_xml () {
     my $xml =
         q{<?xml version="1.0"?>}.
@@ -103,6 +137,18 @@ method capabilities_xml () {
     $xml .= q{</w:robot>};
 
     return $xml;
+}
+
+method profile_json () {
+    if ($self->profile_handler) {
+        return encode_json($self->profile_handler->($self));
+    }
+
+    return encode_json({
+        name       => $self->name,
+        profileUrl => $self->profile_url,
+        imageUrl   => $self->image_url,
+    });
 }
 
 method process_events ( JSON $json ) {

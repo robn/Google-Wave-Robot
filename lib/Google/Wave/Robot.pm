@@ -55,7 +55,6 @@ has profile_handler => (
 has verification_token => (
     is       => "ro",
     isa      => Str,
-    required => 1,
 );
 
 has security_token => (
@@ -88,9 +87,6 @@ method _profile_sanity_check () {
 
 method BUILD {
     $self->_profile_sanity_check;
-}
-
-method verification_token_info () {
 }
 
 method setup_oauth () {

@@ -52,6 +52,10 @@ method verify_token_handler ( ClassName $class: Robot $robot, HashRef $env ) {
         return [ 401, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ q{security token doesn't match} ] ];
     }
 
+    if (!($robot->verification_token)) {
+        return [ 404, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ q{verification token not available} ] ];
+    }
+
     return [ 200, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ $robot->verification_token ] ];
 }
 

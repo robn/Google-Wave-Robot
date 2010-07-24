@@ -25,9 +25,11 @@ has button_name => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return {
-        button_name => $json->{properties}->{buttonName},
-    };
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
+    
+    $args->{button_name} = $json->{properties}->{buttonName};
+
+    return $args;
 }
 
 __PACKAGE__->meta->make_immutable;

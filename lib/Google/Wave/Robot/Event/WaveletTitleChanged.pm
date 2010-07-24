@@ -25,9 +25,11 @@ has title => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return {
-        title => $json->{properties}->{title},
-    };
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
+
+    $args->{title} = $json->{properties}->{title};
+
+    return $args;
 }
 
 __PACKAGE__->meta->make_immutable;

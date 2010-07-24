@@ -30,10 +30,12 @@ has message => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return {
-        operation_id => $json->{properties}->{operationId},
-        message      => $json->{properties}->{message},
-    };
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
+
+    $args->{operation_id} = $json->{properties}->{operationId};
+    $args->{message}      = $json->{properties}->{message};
+
+    return $args;
 }
 
 __PACKAGE__->meta->make_immutable;

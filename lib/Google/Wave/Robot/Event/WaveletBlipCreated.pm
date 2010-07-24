@@ -30,7 +30,7 @@ has new_blip => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    my $args;
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
 
     $args->{new_blip_id} = $json->{properties}->{newBlipId};
     $args->{new_blip}    = $wavelet->blip($args->{new_blip_id});

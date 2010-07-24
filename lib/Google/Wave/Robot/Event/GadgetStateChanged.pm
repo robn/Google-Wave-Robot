@@ -30,10 +30,12 @@ has old_state => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return {
-        index     => $json->{properties}->{index},
-        old_state => $json->{properties}->{oldState},
-    };
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
+
+    $args->{index}     = $json->{properties}->{index};
+    $args->{old_state} = $json->{properties}->{oldState};
+
+    return $args;
 }
 
 __PACKAGE__->meta->make_immutable;

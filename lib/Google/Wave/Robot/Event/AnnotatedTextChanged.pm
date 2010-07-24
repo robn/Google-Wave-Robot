@@ -30,10 +30,12 @@ has value => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return {
-        name  => $json->{properties}->{name},
-        value => $json->{properties}->{value},
-    };
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
+
+    $args->{name}  = $json->{properties}->{name};
+    $args->{value} = $json->{properties}->{value};
+
+    return $args;
 }
 
 __PACKAGE__->meta->make_immutable;

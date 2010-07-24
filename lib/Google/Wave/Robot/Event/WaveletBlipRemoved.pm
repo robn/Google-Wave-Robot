@@ -25,9 +25,11 @@ has removed_blip_id => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return {
-        removed_blip_id => $json->{properties}->{removedBlipId},
-    };
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
+
+    $args->{removed_blip_id} = $json->{properties}->{removedBlipId};
+
+    return $args;
 }
 
 __PACKAGE__->meta->make_immutable;

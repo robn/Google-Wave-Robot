@@ -29,13 +29,15 @@ use Google::Wave::Robot::Event::WaveletTitleChanged;
 use Google::Wave::Robot::Event::Context;
 
 has json => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has type => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has modified_by => (
@@ -69,18 +71,21 @@ has blip => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
+    print STDERR "so I'm, like, here\n";
+
     my $args = {
         json         => $json,
         type         => $json->{type},
         modified_by  => $json->{modifiedBy},
-        timestamp    => $json->{timestamp} // 0,
+        timestamp    => $json->{timestamp} || 0,
         proxying_for => $json->{proxyingFor},
     };
 
-    $args->{properties} = $json->{properties} // {},
-
-    $args->{blip_id} = $args->{properties}->{blipId} if exists $args->{properties}->{blip_id};
-    $args->{blip} = $wavelet->blip($args->{blip_id}) if exists $args->{blip_id};
+    if ($json->{properties}) {
+        $args->{properties} = $json->{properties};
+        $args->{blip_id}    = $json->{properties}->{blipId}    if exists $json->{properties}->{blipId};
+        $args->{blip}       = $wavelet->blip($args->{blip_id}) if exists $args->{blip_id};
+    }
 
     return $args;
 }

@@ -30,10 +30,12 @@ has participants_removed => (
 );
 
 method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return {
-        participants_added   => $json->{properties}->{participantsAdded},
-        participants_removed => $json->{properties}->{participantsRemoved},
-    };
+    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
+
+    $args->{participants_added}   = $json->{properties}->{participantsAdded};
+    $args->{participants_removed} = $json->{properties}->{participantsRemoved};
+
+    return $args;
 }
 
 __PACKAGE__->meta->make_immutable;

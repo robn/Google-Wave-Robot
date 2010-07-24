@@ -28,11 +28,11 @@ method run ( ClassName $class: Robot $robot, HashRef $env ) {
 }
 
 method capabilities_handler ( ClassName $class: Robot $robot, HashRef $env ) {
-    return [ 200, [ 'Content-type' => 'text/xml', Pragma => 'no-cache' ], [ $robot->capabilities_xml ] ];
+    return $class->_output(200, 'text/xml', $robot->capabilities_xml);
 }
 
 method profile_handler ( ClassName $class: Robot $robot, HashRef $env ) {
-    return [ 200, [ 'Content-type' => 'application/json', Pragma => 'no-cache' ], [ $robot->profile_json ] ];
+    return $class->_output(200, 'application/json', $robot->profile_json);
 }
 
 method rpc_handler ( ClassName $class: Robot $robot, HashRef $env ) {
@@ -49,24 +49,29 @@ method rpc_handler ( ClassName $class: Robot $robot, HashRef $env ) {
 method verify_token_handler ( ClassName $class: Robot $robot, HashRef $env ) {
     my ($st) = $env->{QUERY_STRING} =~ m/st=(\d+)/;
     if ($st && $robot->security_token && $robot->security_token ne $st) {
-        return [ 401, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ q{security token doesn't match} ] ];
+        return $class->_output(401, 'text/plain', q{security token doesn't match});
     }
 
     if (!($robot->verification_token)) {
-        return [ 404, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ q{verification token not available} ] ];
+        return $class->_output(404, 'text/plain', q{verification token not available});
     }
 
-    return [ 200, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ $robot->verification_token ] ];
+    return $class->_output(200, 'text/plain', $robot->verification_token);
 }
 
 method unknown_handler ( ClassName $class: ) {
-    my $status = 404;
-    my $headers = [
-        'Content-Type' => 'text/plain',
-    ];
-    my $body = [ 'not found' ];
+    return $class->_output(404, 'text/plain', q{not found});
+}
 
-    return [ $status, $headers, $body ];
+method _output ( ClassName $class: Int $status, Str $content_type, Str $content ) {
+    return [
+        $status,
+        [
+            'Content-type' => $content_type,
+            Pragma         => 'no-cache',
+        ],
+        [ $content ],
+    ];
 }
 
 __PACKAGE__->meta->make_immutable;

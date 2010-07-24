@@ -38,7 +38,7 @@ method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
     return $args;
 }
 
-__PACKAGE__->meta->make_immutable;
+#__PACKAGE__->meta->make_immutable;
 
 1;
 

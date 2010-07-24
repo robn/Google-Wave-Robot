@@ -19,11 +19,7 @@ class_has type => (
     init_arg => undef,
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    return $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
-}
-
-__PACKAGE__->meta->make_immutable;
+#__PACKAGE__->meta->make_immutable;
 
 1;
 

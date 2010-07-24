@@ -12,81 +12,81 @@ use Google::Wave::Robot::Types qw(Blip OperationQueue);
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Operation::Queue;
 
-has "wavelet_id" => (
+has wavelet_id => (
     is       => "ro",
     isa      => Str,
     required => 1,
 );
 
-has "wave_id" => (
+has wave_id => (
     is       => "ro",
     isa      => Str,
     required => 1,
 );
 
-has "creator" => (
+has creator => (
     is       => "ro",
     isa      => Str,
     required => 1,
 );
 
-has "creation_time" => (
+has creation_time => (
     is       => "ro",
     isa      => Str,
     required => 1,
 );
 
-has "last_modified_time" => (
+has last_modified_time => (
     is       => "ro",
     isa      => Str,
     required => 1,
 );
 
-has "title" => (
+has title => (
     is       => "rw",
     isa      => Str,  # XXX hook setter to call set_title and adjust the content
     default  => '',
 );
 
-has "operation_queue" => (
+has operation_queue => (
     is       => "ro",
     isa      => OperationQueue,
     required => 1,
 );
 
-has "robot_address" => (
+has robot_address => (
     is  => "ro",
     isa => Str,  # XXX can't be set if already set
 );
 
-has "data_documents" => (
+has data_documents => (
     is  => "ro",
     isa => HashRef[Str],    # XXX key/value pairs, needs some handlers that hook DATADOC_SET
 );
 
-has "participants" => (
+has participants => (
     is  => "ro",
     isa => ArrayRef[Str],  # XXX list of addresses, needs handlers that hook ADD_PARTICIPANT
                              # XXX seperate objects with roles included? +profiles when that api hits
 );
 
-has "root_thread" => (
+has root_thread => (
     is  => "ro",
     isa => Object,  # XXX BlipThread
 );
 
-has "tags" => (
+has tags => (
     is  => "ro",
     isa => ArrayRef[Str], # XXX list of tags, needs handlers that hook MODIFY_TAG
 );
 
-has "root_blip_id" => (
+has root_blip_id => (
     is       => "ro",
     isa      => Str,
     required => 1,
 );
 
-has "root_blip" => (
+has root_blip => (
     is       => "ro",
     isa      => Blip,
     # XXX required => 1,

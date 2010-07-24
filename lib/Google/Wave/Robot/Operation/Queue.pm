@@ -15,12 +15,12 @@ use Clone qw(clone);
 
 my $next_operation_id = 1;
 
-has "capabilities_hash" => (
+has capabilities_hash => (
     is  => "rw",
     isa => Str,
 );
 
-has "_pending" => (
+has _pending => (
     traits  => ["Array"],
     is      => "rw",
     isa     => ArrayRef[Operation],
@@ -30,7 +30,7 @@ has "_pending" => (
     },
 );
 
-has "_proxy_for_id" => (
+has _proxy_for_id => (
     is  => "rw",
     isa => Str,
 );

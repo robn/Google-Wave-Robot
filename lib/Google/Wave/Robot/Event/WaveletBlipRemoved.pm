@@ -12,14 +12,14 @@ use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
 
-class_has "type" => (
+class_has type => (
     is       => "ro",
     isa      => Str,
     default  => "WAVELET_BLIP_REMOVED",
     init_arg => undef,
 );
 
-has "removed_blip_id" => (
+has removed_blip_id => (
     is  => "ro",
     isa => Str,
 );

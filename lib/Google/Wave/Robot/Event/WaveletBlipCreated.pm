@@ -12,19 +12,19 @@ use Google::Wave::Robot::Types qw(Wavelet Blip);
 
 extends ("Google::Wave::Robot::Event");
 
-class_has "type" => (
+class_has type => (
     is       => "ro",
     isa      => Str,
     default  => "WAVELET_BLIP_CREATED",
     init_arg => undef,
 );
 
-has "new_blip_id" => (
+has new_blip_id => (
     is  => "ro",
     isa => Str,
 );
 
-has "new_blip" => (
+has new_blip => (
     is  => "ro",
     isa => Blip,
 );

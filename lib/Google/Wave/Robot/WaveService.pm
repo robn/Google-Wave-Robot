@@ -29,33 +29,33 @@ use constant {
     SANDBOX_RPC_URL   => q{https://www-opensocial-sandbox.googleusercontent.com/api/rpc},
 };
 
-has "ua" => (
+has ua => (
     is     => "rw",
     isa    => UserAgent,
     coerce => 1,
 );
 
-has "_server_rpc_base" => (
+has _server_rpc_base => (
     is  => "rw",
     isa => Str,
 );
 
-has "_consumer_key" => (
+has _consumer_key => (
     is  => "rw",
     isa => Str,
 );
 
-has "_consumer_secret" => (
+has _consumer_secret => (
     is  => "rw",
     isa => Str,
 );
 
-has "_access_token" => (
+has _access_token => (
     is  => "rw",
     isa => Str,
 );
 
-has "_access_token_secret" => (
+has _access_token_secret => (
     is  => "rw",
     isa => Str,
 );

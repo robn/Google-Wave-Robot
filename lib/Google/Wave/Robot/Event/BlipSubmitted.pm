@@ -11,7 +11,7 @@ use MooseX::Types::Moose qw(Str);
 
 extends ("Google::Wave::Robot::Event");
 
-class_has "type" => (
+class_has type => (
     is       => "ro",
     isa      => "Str",
     default  => "BLIP_SUBMITTED",

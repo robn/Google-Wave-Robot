@@ -12,19 +12,19 @@ use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
 
-class_has "type" => (
+class_has type => (
     is       => "ro",
     isa      => Str,
     default  => "WAVELET_PARTICIPANTS_CHANGED",
     init_arg => undef,
 );
 
-has "participants_added" => (
+has participants_added => (
     is  => "ro",
     isa => ArrayRef[Str],
 );
 
-has "participants_removed" => (
+has participants_removed => (
     is  => "ro",
     isa => ArrayRef[Str],
 );

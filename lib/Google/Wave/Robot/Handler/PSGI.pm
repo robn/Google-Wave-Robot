@@ -14,7 +14,7 @@ method run ( ClassName $class: Robot $robot, HashRef $env ) {
             return $class->capabilities_handler($robot, $env);
         }
         when (m{/_wave/robot/profile$}) {
-            return $class->profiles_handler($robot, $env);
+            return $class->profile_handler($robot, $env);
         }
         when (m{/_wave/robot/jsonrpc$}) {
             return $class->rpc_handler($robot, $env);
@@ -31,7 +31,7 @@ method capabilities_handler ( ClassName $class: Robot $robot, HashRef $env ) {
     return [ 200, [ 'Content-type' => 'text/xml', Pragma => 'no-cache' ], [ $robot->capabilities_xml ] ];
 }
 
-method profiles_handler ( ClassName $class: Robot $robot, HashRef $env ) {
+method profile_handler ( ClassName $class: Robot $robot, HashRef $env ) {
     return [ 200, [ 'Content-type' => 'application/json', Pragma => 'no-cache' ], [ $robot->profile_json ] ];
 }
 

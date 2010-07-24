@@ -43,31 +43,28 @@ has child_blip_ids => (
 has creator => (
     is       => "ro",
     isa      => Str,
-    required => 1,
 );
 
 has contributors => (
     is       => "ro",
     isa      => ArrayRef[Str],
-    required => 1,
 );
 
 has last_modified_time => (
     is       => "ro",
     isa      => Str,
-    required => 1,
 );
 
 has version => (
     is       => "ro",
     isa      => Str,
-    required => 1,
 );
 
 has text => (
     is       => "ro",
     isa      => Str,
     required => 1,
+    writer   => "_set_text",
 );
 
 has operation_queue => (
@@ -102,17 +99,45 @@ method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_
     $args->{blip_id}            = $json->{blipId};
     $args->{wavelet_id}         = $json->{waveletId};
     $args->{wave_id}            = $json->{waveId};
-    $args->{parent_blip_id}     = $json->{parentBlipId} if defined $json->{parentBlipId};
-    $args->{child_blip_ids}     = $json->{childBlipIds};
-    $args->{creator}            = $json->{creator};
-    $args->{contributors}       = $json->{contributors};
-    $args->{last_modified_time} = $json->{lastModifiedTime};
-    $args->{version}            = $json->{version};
     $args->{text}               = $json->{content};
+
+    $args->{parent_blip_id}     = $json->{parentBlipId}     if defined $json->{parentBlipId};
+    $args->{child_blip_ids}     = $json->{childBlipIds}     if defined $json->{childBlipIds};
+    $args->{creator}            = $json->{creator}          if defined $json->{creator};
+    $args->{contributors}       = $json->{contributors}     if defined $json->{contributors};
+    $args->{last_modified_time} = $json->{lastModifiedTime} if defined $json->{lastModifiedTime};
+    $args->{version}            = $json->{version}          if defined $json->{version};
 
     # XXX annotations, elements
     
     return $args;
+}
+
+method reply () {
+    my $blip_data = $self->operation_queue->blip_create_child(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        blip_id    => $self->blip_id,
+    );
+    my $blip = Google::Wave::Robot::Blip->new(
+        json            => $blip_data,
+        operation_queue => $self->operation_queue,
+        other_blips     => $self->_other_blips,
+    );
+    $self->_other_blips->add($blip->blip_id, $blip);
+}
+
+method append_markup ( Str $markup ) {
+    # XXX markup = util.force_unicode(markup)
+
+    $self->operation_queue->document_append_markup(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        blip_id    => $self->blip_id,
+        content    => $markup,
+    );
+
+    $self->_set_text($self->text.$markup);
 }
 
 __PACKAGE__->meta->make_immutable;

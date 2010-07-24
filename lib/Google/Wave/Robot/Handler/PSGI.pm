@@ -19,7 +19,7 @@ method run ( ClassName $class: Robot $robot, HashRef $env ) {
         when (m{/_wave/robot/jsonrpc$}) {
             return $class->rpc_handler($robot, $env);
         }
-        when (m{/_wave/verify_token$}) {
+        when (m{/_wave/verify_token(?:\?st=\d+)?$}) {
             return $class->verify_token_handler($robot, $env);
         }
     }
@@ -47,6 +47,12 @@ method rpc_handler ( ClassName $class: Robot $robot, HashRef $env ) {
 }
 
 method verify_token_handler ( ClassName $class: Robot $robot, HashRef $env ) {
+    my ($st) = $env->{QUERY_STRING} =~ m/st=(\d+)/;
+    if ($st && $robot->security_token && $robot->security_token ne $st) {
+        return [ 401, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ q{security token doesn't match} ] ];
+    }
+
+    return [ 200, [ 'Content-type' => 'text/plain', Pragma => 'no-cache' ], [ $robot->verification_token ] ];
 }
 
 method unknown_handler ( ClassName $class: ) {

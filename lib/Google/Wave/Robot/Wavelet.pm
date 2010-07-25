@@ -58,10 +58,15 @@ has operation_queue => (
 );
 
 has robot_address => (
-    is      => "ro",
-    isa     => Str,  # XXX can't be set if already set
+    is      => "rw",
+    isa     => Str,
     default => '',
 );
+
+before robot_address => sub {
+    my $self = shift;
+    confess "robot_address is already set" if @_ > 0 && $self->robot_address;
+};
 
 has data_documents => (
     is      => "ro",

@@ -2,6 +2,8 @@ package Google::Wave::Robot::Blip::Set;
 
 use 5.010;
 
+use namespace::autoclean;
+
 use Moose;
 use MooseX::Types::Moose qw(HashRef);
 use Google::Wave::Robot::Types qw(Blip);

@@ -162,9 +162,7 @@ method process_events ( JSON $json ) {
     my $parsed = decode_json($json);
 
     my $pending_ops = Google::Wave::Robot::Operation::Queue->new;
-    my $event_wavelet = Google::Wave::Robot::Wavelet->new(
-        json            => $parsed, 
-        operation_queue => $pending_ops,
+    my $event_wavelet = Google::Wave::Robot::Wavelet->new_from_json($parsed, operation_queue => $pending_ops);
     );
 
     for my $event_data (@{$parsed->{events}}) {

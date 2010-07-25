@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Str);
+use MooseX::Types::Moose qw(Str Bool);
 use MooseX::Types::LWP::UserAgent qw(UserAgent);
 use Google::Wave::Robot::Types qw(OperationQueue);
 
@@ -30,71 +30,63 @@ use constant {
 };
 
 has ua => (
-    is     => "rw",
-    isa    => UserAgent,
-    coerce => 1,
+    is      => "rw",
+    isa     => UserAgent,
+    coerce  => 1,
+    default => sub { [] },
 );
 
-has _server_rpc_base => (
+has use_sandbox => (
+    is      => "ro",
+    isa     => Bool,
+    default => 0,
+);
+
+has server_rpc_base => (
+    is      => "ro",
+    isa     => Str,
+    default => sub { shift->use_sandbox ? SANDBOX_RPC_URL : RPC_URL },
+    lazy    => 1,
+);
+
+has consumer_key => (
+    is      => "ro",
+    isa     => Str,
+    default => 'anonymous',
+);
+
+has consumer_secret => (
+    is      => "ro",
+    isa     => Str,
+    default => 'anonymous',
+);
+
+has access_token => (
     is  => "rw",
     isa => Str,
 );
 
-has _consumer_key => (
+has access_token_secret => (
     is  => "rw",
     isa => Str,
 );
-
-has _consumer_secret => (
-    is  => "rw",
-    isa => Str,
-);
-
-has _access_token => (
-    is  => "rw",
-    isa => Str,
-);
-
-has _access_token_secret => (
-    is  => "rw",
-    isa => Str,
-);
-
-method BUILDARGS ( ClassName $class:
-                   Bool      :$use_sandbox?, 
-                   Str       :$server_rpc_base?, 
-                   Str       :$consumer_key? = "anonymous", 
-                   Str       :$consumer_secret? = "anonymous",
-                   UserAgent :$ua? ) {
-
-    return {
-        _server_rpc_base => $server_rpc_base ? $server_rpc_base :
-                            $use_sandbox     ? SANDBOX_RPC_URL  :
-                                               RPC_URL,
-
-        _consumer_key    => $consumer_key,
-        _consumer_secret => $consumer_secret,
-
-        ua               => $ua // [],
-    };
-}
 
 method post_operation_queue ( OperationQueue $queue ) {
     my $data = encode_json($queue->serialize(method_prefix => 'wave'));
 
     my $oauth_req;
-    if ($self->_access_token) {
+    if ($self->access_token) {
         $oauth_req = Net::OAuth->request("protected resource")->new(
             $self->_default_request_params("POST"),
-            request_url  => $self->_server_rpc_base,
-            token        => $self->_access_token,
-            token_secret => $self->_access_token_secret,
+            request_url  => $self->server_rpc_base,
+            token        => $self->access_token,
+            token_secret => $self->access_token_secret,
         );
     }
     else {
         $oauth_req = Net::OAuth->request("consumer")->new(
             $self->_default_request_params("POST"),
-            request_url     => $self->_server_rpc_base,
+            request_url     => $self->server_rpc_base,
         );
     }
     $oauth_req->sign;
@@ -104,7 +96,7 @@ method post_operation_queue ( OperationQueue $queue ) {
         "Authorization" => $oauth_req->to_authorization_header,
     };
 
-    my $url = $self->_server_rpc_base;
+    my $url = $self->server_rpc_base;
     my $res;
     while (!$res) {
         $res = $self->ua->post($url, %{$headers}, Content => $data);
@@ -124,8 +116,8 @@ method post_operation_queue ( OperationQueue $queue ) {
 method _default_request_params ( Str $method? = 'GET' ) {
     return (
         protocol_version => $Net::OAuth::PROTOCOL_VERSION_1_0A,
-        consumer_key     => $self->_consumer_key,
-        consumer_secret  => $self->_consumer_secret,
+        consumer_key     => $self->consumer_key,
+        consumer_secret  => $self->consumer_secret,
         request_method   => $method,
         signature_method => "HMAC-SHA1",
         timestamp        => time,

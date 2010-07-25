@@ -5,7 +5,7 @@ use 5.010;
 use namespace::autoclean;
 
 use MooseX::Types -declare => [qw(
-    Robot Wavelet Blip BlipSet Operation OperationQueue
+    Robot Wavelet Blip BlipSet Operation OperationQueue Participant
 )];
 
 class_type Robot,          { class => 'Google::Wave::Robot' };
@@ -14,6 +14,7 @@ class_type Blip,           { class => 'Google::Wave::Robot::Blip' };
 class_type BlipSet,        { class => 'Google::Wave::Robot::Blip::Set' };
 class_type Operation,      { class => 'Google::Wave::Robot::Operation' };
 class_type OperationQueue, { class => 'Google::Wave::Robot::Operation::Queue' };
+class_type Participant,    { class => 'Google::Wave::Robot::Participant' };
 
 1;
 

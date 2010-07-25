@@ -133,11 +133,7 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
     my $blips = $wavelet->blips;
 
     for my $blip_data (values %{$json->{blips}}) {
-        my $blip = Google::Wave::Robot::Blip->new(
-            json            => $blip_data,
-            operation_queue => $operation_queue,
-            other_blips     => $blips,
-        );
+        my $blip = Google::Wave::Robot::Blip->new_from_json($blip_data, operation_queue => $operation_queue, other_blips => $blips);
         $blips->add($blip->blip_id, $blip);
     }
     

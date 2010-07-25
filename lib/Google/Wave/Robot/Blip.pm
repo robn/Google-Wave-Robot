@@ -6,8 +6,8 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Str HashRef ArrayRef);
-use Google::Wave::Robot::Types qw(BlipSet OperationQueue Blip);
+use MooseX::Types::Moose qw(Str Int HashRef ArrayRef);
+use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue);
 
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
@@ -31,48 +31,55 @@ has wave_id => (
 );
 
 has parent_blip_id => (
-    is  => "ro",
-    isa => Str,
+    is      => "ro",
+    isa     => Str,
+    default => '',
 );
 
 has child_blip_ids => (
-    is  => "ro",
-    isa => ArrayRef[Str],
+    is      => "ro",
+    isa     => ArrayRef[Str],
+    default => sub { [] },
 );
 
 has creator => (
-    is       => "ro",
-    isa      => Str,
+    is      => "ro",
+    isa     => Str,
+    default => '',
 );
 
 has contributors => (
-    is       => "ro",
-    isa      => ArrayRef[Str],
+    is      => "ro",
+    isa     => ArrayRef[Str],  # XXX ParticipantSet?
+    default => sub { [] },
 );
 
 has last_modified_time => (
-    is       => "ro",
-    isa      => Str,
+    is      => "ro",
+    isa     => Int,
+    default => 0,
 );
 
 has version => (
-    is       => "ro",
-    isa      => Str,
+    is      => "ro",
+    isa     => Int,
+    default => 0,
 );
 
 has text => (
     is       => "ro",
     isa      => Str,
-    required => 1,
     writer   => "_set_text",
+    default  => '',
 );
 
 has operation_queue => (
-    is       => "ro",
-    isa      => OperationQueue,
-    required => 1,
+    is      => "ro",
+    isa     => OperationQueue,
+    default => sub { Google::Wave::Robot::Operation::Queue->new },
 );
 
+=pod
 has annotations => (
     is  => "ro",
     isa => ArrayRef,   # XXX ArrayRef[Annotation]
@@ -82,35 +89,38 @@ has elements => (
     is       => "ro",
     isa      => ArrayRef,   # XXX ArrayRef[Elements]
 );
+=cut
 
 has _other_blips => (
     is      => "ro",
     isa     => BlipSet,
     default => sub { Google::Wave::Robot::Blip::Set->new },
+    lazy    => 1,
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, OperationQueue :$operation_queue?, BlipSet :$other_blips? )
+method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operation_queue?, BlipSet :$other_blips? )
 {
-    my $args = {};
+    my %args = (
+        blip_id    => $json->{blipId},
+        wavelet_id => $json->{waveletId},
+        wave_id    => $json->{waveId},
+    );
 
-    $args->{operation_queue} = $operation_queue || Google::Wave::Robot::Operation::Queue->new;
-    $args->{_other_blips} = $other_blips if $other_blips;
+    $args{operation_queue} = $operation_queue if $operation_queue;
+    $args{_other_blips}    = $other_blips if $other_blips;
 
-    $args->{blip_id}            = $json->{blipId};
-    $args->{wavelet_id}         = $json->{waveletId};
-    $args->{wave_id}            = $json->{waveId};
-    $args->{text}               = $json->{content};
-
-    $args->{parent_blip_id}     = $json->{parentBlipId}     if defined $json->{parentBlipId};
-    $args->{child_blip_ids}     = $json->{childBlipIds}     if defined $json->{childBlipIds};
-    $args->{creator}            = $json->{creator}          if defined $json->{creator};
-    $args->{contributors}       = $json->{contributors}     if defined $json->{contributors};
-    $args->{last_modified_time} = $json->{lastModifiedTime} if defined $json->{lastModifiedTime};
-    $args->{version}            = $json->{version}          if defined $json->{version};
+    $args{parent_blip_id}     = $json->{parentBlipId}     if defined $json->{parentBlipId};
+    $args{child_blip_ids}     = $json->{childBlipIds}     if defined $json->{childBlipIds};
+    $args{creator}            = $json->{creator}          if defined $json->{creator};
+    $args{contributors}       = $json->{contributors}     if defined $json->{contributors};
+    $args{last_modified_time} = $json->{lastModifiedTime} if defined $json->{lastModifiedTime};
+    $args{version}            = $json->{version}          if defined $json->{version};
 
     # XXX annotations, elements
     
-    return $args;
+    my $blip = $class->new(%args);
+    
+    return $blip;
 }
 
 method reply () {

@@ -7,7 +7,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str HashRef ArrayRef Object);
-use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue);
+use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue ParticipantSet);
 
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
@@ -69,8 +69,10 @@ has data_documents => (
 
 has participants => (
     is  => "ro",
-    isa => ArrayRef[Str],  # XXX list of addresses, needs handlers that hook ADD_PARTICIPANT
-                             # XXX seperate objects with roles included? +profiles when that api hits
+    isa => ParticipantSet,  # XXX needs handlers that hook ADD_PARTICIPANT
+    handles => {
+        participant => 'get',
+    },
 );
 
 has root_thread => (
@@ -147,7 +149,9 @@ method add_proxying_participant ( Str $proxy_id ) {
 
     my $new_id = sprintf q{%s+%s%s@%s}, $robot_id, $proxy_id, $version ? "#$version" : '', $domain;
 
-    # XXX $self->participants->add($new_id);
+    $self->participants->add($new_id);
+
+    # XXX put this into the particpants set class
     $self->operation_queue->wavelet_add_participant(wave_id => $self->wave_id, wavelet_id => $self->wavelet_id, participant_id => $new_id);
 }
 

@@ -8,6 +8,8 @@ use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str);
 
+# XXX include profile stuff here?
+
 has id => (
 	is		 => "ro",
 	isa		 => Str,

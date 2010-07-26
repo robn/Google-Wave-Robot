@@ -8,20 +8,22 @@ use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str);
-use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
+
+__PACKAGE__->register_event_class("ANNOTATED_TEXT_CHANGE");
 
 class_has type => (
     is       => "ro",
     isa      => Str,
-    default  => "ANNOTATED_TEXT_CHANGED",
+    default  => "ANNOTATED_TEXT_CHANGE",
     init_arg => undef,
 );
 
 has name => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has value => (
@@ -29,16 +31,7 @@ has value => (
     isa => Str,
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
-
-    $args->{name}  = $json->{properties}->{name};
-    $args->{value} = $json->{properties}->{value};
-
-    return $args;
-}
-
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 1;
 

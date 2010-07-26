@@ -8,9 +8,10 @@ use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str);
-use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
+
+__PACKAGE__->register_event_class("GADGET_STATE_CHANGED");
 
 class_has type => (
     is       => "ro",
@@ -20,25 +21,18 @@ class_has type => (
 );
 
 has index => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
 has old_state => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
-
-    $args->{index}     = $json->{properties}->{index};
-    $args->{old_state} = $json->{properties}->{oldState};
-
-    return $args;
-}
-
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 1;
 

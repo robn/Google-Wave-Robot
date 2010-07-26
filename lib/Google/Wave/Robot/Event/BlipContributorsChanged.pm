@@ -8,9 +8,10 @@ use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str ArrayRef);
-use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
+
+__PACKAGE__->register_event_class("BLIP_CONTRIBUTORS_CHANGED");
 
 class_has type => (
     is       => "ro",
@@ -20,25 +21,18 @@ class_has type => (
 );
 
 has contributors_added => (
-    is  => "ro",
-    isa => ArrayRef[Str],
+    is      => "ro",
+    isa     => ArrayRef[Str],   # XXX ParticipantSet?
+    default => sub { [] },
 );
 
 has contributors_removed => (
-    is  => "ro",
-    isa => ArrayRef[Str],
+    is      => "ro",
+    isa     => ArrayRef[Str],
+    default => sub { [] },
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
-    
-    $args->{contributors_added}   = $json->{properties}->{contributorsAdded};
-    $args->{contributors_removed} = $json->{properties}->{contributorsRemoved};
-
-    return $args;
-}
-
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 1;
 

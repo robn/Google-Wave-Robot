@@ -8,9 +8,10 @@ use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str);
-use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
+
+__PACKAGE__->register_event_class("WAVELET_CREATED");
 
 class_has type => (
     is       => "ro",
@@ -24,15 +25,7 @@ has message => (
     isa => Str,
 );
 
-method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
-
-    $args->{message} = $json->{properties}->{message};
-
-    return $args;
-}
-
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 1;
 

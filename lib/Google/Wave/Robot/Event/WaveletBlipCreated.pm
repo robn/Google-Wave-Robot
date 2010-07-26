@@ -12,6 +12,8 @@ use Google::Wave::Robot::Types qw(Wavelet Blip);
 
 extends ("Google::Wave::Robot::Event");
 
+__PACKAGE__->register_event_class("WAVELET_BLIP_CREATED");
+
 class_has type => (
     is       => "ro",
     isa      => Str,
@@ -20,25 +22,16 @@ class_has type => (
 );
 
 has new_blip_id => (
-    is  => "ro",
-    isa => Str,
+    is       => "ro",
+    isa      => Str,
+    required => 1,
 );
 
-has new_blip => (
-    is  => "ro",
-    isa => Blip,
-);
-
-method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    my $args = $class->SUPER::BUILDARGS(json => $json, wavelet => $wavelet);
-
-    $args->{new_blip_id} = $json->{properties}->{newBlipId};
-    $args->{new_blip}    = $wavelet->blip($args->{new_blip_id});
-
-    return $args;
+method new_blip () {
+    return $self->wavelet->blip($self->new_blip_id);
 }
 
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 1;
 

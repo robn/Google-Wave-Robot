@@ -8,9 +8,10 @@ use Moose;
 use MooseX::Method::Signatures;
 use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str);
-use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
+
+__PACKAGE__->register_event_class("WAVELET_SELF_ADDED");
 
 class_has type => (
     is       => "ro",
@@ -19,7 +20,7 @@ class_has type => (
     init_arg => undef,
 );
 
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 1;
 

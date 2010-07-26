@@ -16,6 +16,7 @@ class_type Operation,      { class => 'Google::Wave::Robot::Operation' };
 class_type OperationQueue, { class => 'Google::Wave::Robot::Operation::Queue' };
 class_type Participant,    { class => 'Google::Wave::Robot::Participant' };
 class_type ParticipantSet, { class => 'Google::Wave::Robot::Participant::Set' };
+class_type TagSet,         { class => 'Google::Wave::Robot::Wavelet::TagSet' };
 
 1;
 

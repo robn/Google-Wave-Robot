@@ -66,10 +66,10 @@ has version => (
     default => 0,
 );
 
-has text => (
+has content => (
     is       => "ro",
     isa      => Str,
-    writer   => "_set_text",
+    writer   => "_set_content",
     default  => '',
 );
 
@@ -112,6 +112,7 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
     $args{parent_blip_id}     = $json->{parentBlipId}     if defined $json->{parentBlipId};
     $args{child_blip_ids}     = $json->{childBlipIds}     if defined $json->{childBlipIds};
     $args{creator}            = $json->{creator}          if defined $json->{creator};
+    $args{content}            = $json->{content}          if defined $json->{content};
     $args{contributors}       = $json->{contributors}     if defined $json->{contributors};
     $args{last_modified_time} = $json->{lastModifiedTime} if defined $json->{lastModifiedTime};
     $args{version}            = $json->{version}          if defined $json->{version};
@@ -147,7 +148,7 @@ method append_markup ( Str $markup ) {
         content    => $markup,
     );
 
-    $self->_set_text($self->text.$markup);
+    $self->_set_content($self->content.$markup);
 }
 
 __PACKAGE__->meta->make_immutable;

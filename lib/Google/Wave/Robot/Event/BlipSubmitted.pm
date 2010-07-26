@@ -12,6 +12,8 @@ use Google::Wave::Robot::Types qw(Wavelet);
 
 extends ("Google::Wave::Robot::Event");
 
+__PACKAGE__->register_event_class("BLIP_SUBMITTED");
+
 class_has type => (
     is       => "ro",
     isa      => "Str",
@@ -19,7 +21,7 @@ class_has type => (
     init_arg => undef,
 );
 
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 1;
 

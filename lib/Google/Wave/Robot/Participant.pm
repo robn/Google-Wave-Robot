@@ -7,6 +7,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str);
+use Moose::Util::TypeConstraints;
 
 # XXX include profile stuff here?
 

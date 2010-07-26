@@ -7,7 +7,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str Int HashRef ArrayRef Object);
-use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue ParticipantSet);
+use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue ParticipantSet TagSet);
 
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
@@ -99,12 +99,22 @@ has root_thread => (
 );
 =cut
 
-=pod
 has tags => (
-    is  => "ro",
-    isa => ArrayRef[Str], # XXX list of tags, needs handlers that hook MODIFY_TAG
+    is      => "ro",
+    isa     => TagSet
+    handles => {
+        tag => 'get',
+    },
+    default => sub {
+        my $self = shift;
+        Google::Wave::Robot::Wavelet::TagSet->new(
+            wave_id         => $self->wave_id,
+            wavelet_id      => $self->wavelet_id,
+            operation_queue => $self->operation_queue
+        ) 
+    },
+    lazy    => 1,
 );
-=cut
 
 has root_blip_id => (
     is      => "ro",
@@ -149,6 +159,9 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
         my $blip = Google::Wave::Robot::Blip->new_from_json($blip_data, operation_queue => $operation_queue, other_blips => $blips);
         $blips->add($blip->blip_id, $blip);
     }
+
+    # XXX populate participants
+    # XXX populate tags
     
     # XXX do threads
 

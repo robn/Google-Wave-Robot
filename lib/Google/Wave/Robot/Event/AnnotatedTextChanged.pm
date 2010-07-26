@@ -6,19 +6,11 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str);
 
 extends ("Google::Wave::Robot::Event");
 
 __PACKAGE__->register_event_class("ANNOTATED_TEXT_CHANGE");
-
-class_has type => (
-    is       => "ro",
-    isa      => Str,
-    default  => "ANNOTATED_TEXT_CHANGE",
-    init_arg => undef,
-);
 
 has name => (
     is       => "ro",

@@ -6,19 +6,11 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str);
 
 extends ("Google::Wave::Robot::Event");
 
 __PACKAGE__->register_event_class("OPERATION_ERROR");
-
-class_has type => (
-    is       => "ro",
-    isa      => Str,
-    default  => "OPERATION_ERROR",
-    init_arg => undef,
-);
 
 has operation_id => (
     is       => "ro",

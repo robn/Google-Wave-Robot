@@ -6,19 +6,11 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::ClassAttribute;
 use MooseX::Types::Moose qw(Str ArrayRef);
 
 extends ("Google::Wave::Robot::Event");
 
 __PACKAGE__->register_event_class("WAVELET_PARTICIPANTS_CHANGED");
-
-class_has type => (
-    is       => "ro",
-    isa      => Str,
-    default  => "WAVELET_PARTICIPANTS_CHANGED",
-    init_arg => undef,
-);
 
 has participants_added => (
     is  => "ro",

@@ -10,17 +10,17 @@ use MooseX::Types::Moose qw(Str Int HashRef);
 use Google::Wave::Robot::Types qw(Wavelet);
 
 my %event_class_for;
+my %type_for;
 
 method register_event_class ( ClassName $class: Str $type, Str :class($event_class)? ) {
     $event_class //= caller;
     $event_class_for{$type} = $event_class;
+    $type_for{$event_class} = $type;
 }
 
-has type => (
-    is       => "ro",
-    isa      => Str,
-    required => 1,
-);
+method type ( ClassName $class: ) {
+    return $type_for{$class};
+}
 
 has wavelet => (
     is       => "ro",
@@ -59,7 +59,6 @@ method new_from_json ( ClassName $class: HashRef $json, Wavelet :$wavelet ) {
     confess "event type '$type' not registered" if !$event_class;
 
     my %args = (
-        type    => $type,
         wavelet => $wavelet,
     );
 

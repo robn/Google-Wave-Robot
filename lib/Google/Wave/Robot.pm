@@ -12,10 +12,28 @@ use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str Int HashRef CodeRef);
 use MooseX::Types::JSON qw(JSON);
 
-use Google::Wave::Robot::Event;
 use Google::Wave::Robot::Operation;
 use Google::Wave::Robot::Operation::Queue;
 use Google::Wave::Robot::Wavelet;
+
+use Google::Wave::Robot::Event;
+use Google::Wave::Robot::Event::Context;
+use Google::Wave::Robot::Event::AnnotatedTextChanged;
+use Google::Wave::Robot::Event::BlipContributorsChanged;
+use Google::Wave::Robot::Event::BlipSubmitted;
+use Google::Wave::Robot::Event::DocumentChanged;
+use Google::Wave::Robot::Event::FormButtonClicked;
+use Google::Wave::Robot::Event::GadgetStateChanged;
+use Google::Wave::Robot::Event::OperationError;
+use Google::Wave::Robot::Event::WaveletBlipCreated;
+use Google::Wave::Robot::Event::WaveletBlipRemoved;
+use Google::Wave::Robot::Event::WaveletCreated;
+use Google::Wave::Robot::Event::WaveletFetched;
+use Google::Wave::Robot::Event::WaveletParticipantsChanged;
+use Google::Wave::Robot::Event::WaveletSelfAdded;
+use Google::Wave::Robot::Event::WaveletSelfRemoved;
+use Google::Wave::Robot::Event::WaveletTagsChanged;
+use Google::Wave::Robot::Event::WaveletTitleChanged;
 
 use JSON qw(encode_json decode_json);
 
@@ -163,11 +181,10 @@ method process_events ( JSON $json ) {
 
     my $pending_ops = Google::Wave::Robot::Operation::Queue->new;
     my $event_wavelet = Google::Wave::Robot::Wavelet->new_from_json($parsed, operation_queue => $pending_ops);
-    );
 
     for my $event_data (@{$parsed->{events}}) {
         if (my $handler = $self->_handlers->{$event_data->{type}}) {
-            my $event = $handler->{event_class}->new(json => $event_data, wavelet => $event_wavelet);
+            my $event = $handler->{event_class}->new_from_json($event_data, wavelet => $event_wavelet);
             $handler->{callback}->($event, $event_wavelet);
         }
     }

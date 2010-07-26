@@ -12,6 +12,7 @@ use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue ParticipantSet);
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
+use Google::Wave::Robot::Participant::Set;
 
 use Carp;
 
@@ -80,7 +81,14 @@ has participants => (
     handles => {
         participant => 'get',
     },
-    default => sub { Google::Wave::Robot::Participant::Set->new },
+    default => sub {
+        my $self = shift;
+        Google::Wave::Robot::Participant::Set->new(
+            wave_id         => $self->wave_id,
+            wavelet_id      => $self->wavelet_id,
+            operation_queue => $self->operation_queue
+        ) 
+    },
     lazy    => 1,
 );
 
@@ -166,9 +174,6 @@ method add_proxying_participant ( Str $proxy_id ) {
     my $new_id = sprintf q{%s+%s%s@%s}, $robot_id, $proxy_id, $version ? "#$version" : '', $domain;
 
     $self->participants->add($new_id);
-
-    # XXX put this into the particpants set class
-    $self->operation_queue->wavelet_add_participant(wave_id => $self->wave_id, wavelet_id => $self->wavelet_id, participant_id => $new_id);
 }
 
 method submit_with () {

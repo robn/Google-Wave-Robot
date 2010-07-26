@@ -9,7 +9,7 @@ use MooseX::Method::Signatures;
 use Google::Wave::Robot::Types qw(Robot);
 
 method run ( ClassName $class: Robot $robot, HashRef $env ) {
-    given ($env->{REQUEST_URI}) {
+    given ($env->{PATH_INFO}) {
         when (m{/_wave/capabilities.xml$}) {
             return $class->capabilities_handler($robot, $env);
         }
@@ -19,7 +19,7 @@ method run ( ClassName $class: Robot $robot, HashRef $env ) {
         when (m{/_wave/robot/jsonrpc$}) {
             return $class->rpc_handler($robot, $env);
         }
-        when (m{/_wave/verify_token(?:\?st=\d+)?$}) {
+        when (m{/_wave/verify_token$}) {
             return $class->verify_token_handler($robot, $env);
         }
     }

@@ -7,7 +7,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str Int HashRef);
-use Google::Wave::Robot::Types qw(Blip Wavelet);
+use Google::Wave::Robot::Types qw(Wavelet);
 
 my %event_class_for;
 
@@ -77,27 +77,6 @@ method new_from_json ( ClassName $class: HashRef $json, Wavelet :$wavelet ) {
 
     return $event_class->new(%args);
 }
-
-=pod
-method BUILDARGS ( ClassName $class: HashRef :$json, Wavelet :$wavelet ) {
-    my $args = {};
-
-    $args->{json}    = $json;
-    $args->{wavelet} = $wavelet;
-
-    $args->{type}         = $json->{type};
-    $args->{modified_by}  = $json->{modifiedBy};
-    $args->{timestamp}    = $json->{timestamp} || 0;
-    $args->{proxying_for} = $json->{proxyingFor} if defined $json->{proxyingFor};
-
-    if ($json->{properties}) {
-        $args->{properties} = $json->{properties};
-        $args->{blip_id}    = $json->{properties}->{blipId} if exists $json->{properties}->{blipId};
-    }
-
-    return $args;
-}
-=cut
 
 method blip () {
     return if !$self->blip_id;

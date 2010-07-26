@@ -182,8 +182,10 @@ method reply ( Str $text? = "\n" ) {
         wavelet_id      => $self->wavelet_id,
         initial_content => $text,
     );
-    my $blip = Google::Wave::Robot::Blip->new(
-        json            => $blip_data,
+    # XXX gets it running again though I really feel like we should be
+    # creating through the normal constructor. or, the opqueue helpers should
+    # return a full blip object
+    my $blip = Google::Wave::Robot::Blip->new_from_json($blip_data,
         operation_queue => $self->operation_queue,
         other_blips     => $self->blips,
     );

@@ -24,7 +24,7 @@ method run ( ClassName $class: Robot $robot, HashRef $env ) {
         }
     }
 
-    return $class->unknown_handler;
+    return $class->unknown_handler($robot, $env);
 }
 
 method capabilities_handler ( ClassName $class: Robot $robot, HashRef $env ) {
@@ -57,7 +57,7 @@ method verify_token_handler ( ClassName $class: Robot $robot, HashRef $env ) {
     return $class->_output(200, 'text/plain', $robot->verification_token);
 }
 
-method unknown_handler ( ClassName $class: ) {
+method unknown_handler ( ClassName $class: Robot $robot, HashRef $env ) {
     return $class->_output(404, 'text/plain', q{not found});
 }
 

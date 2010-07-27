@@ -7,7 +7,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str Int HashRef ArrayRef Object);
-use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue ParticipantSet);
+use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue Participant);
 
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
@@ -75,29 +75,35 @@ has data_documents => (
     default => sub { {} },
 );
 
-has participants => (
-    is      => "ro",
-    isa     => ParticipantSet,
-    handles => {
-        participant => 'get',
-    },
-    default => sub {
-        my $self = shift;
-        Google::Wave::Robot::Participant::Set->new(
-            wave_id         => $self->wave_id,
-            wavelet_id      => $self->wavelet_id,
-            operation_queue => $self->operation_queue
-        ) 
-    },
-    lazy    => 1,
-);
-
 =pod
 has root_thread => (
     is  => "ro",
     isa => Object,  # XXX BlipThread
 );
 =cut
+
+has _participants => (
+    traits  => [ "Hash" ],
+    is      => "ro",
+    isa     => HashRef[Participant],
+    default => sub { {} },
+    handles => {
+        participants     => 'keys',
+        participant      => 'get',
+        _add_participant => 'set',
+    },
+);
+
+method add_participant ( Str $id ) {
+    return if $self->participant($id);
+    $self->_add_participant($id, Google::Wave::Robot::Participant->new(id => $id));
+
+    $self->operation_queue->wavelet_add_participant(
+        wave_id        => $self->wave_id,
+        wavelet_id     => $self->wavelet_id,
+        participant_id => $id,
+    );
+}
 
 has _tags => (
     traits  => [ "Hash" ],
@@ -182,11 +188,15 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
 
     #for my $participant (values %{$json->
 
-    %{$args->{_tags}} = map { $_ => 1 } @{$wavelet_data->{tags}};
+    %{$args{_participants}} = map {
+        $_ => Google::Wave::Robot::Participant->new(
+            id   => $_,
+            role => $wavelet_data->{participantRoles}->{$_} // "FULL"
+        )
+    } @{$wavelet_data->{participants}};
+ 
+    %{$args{_tags}}         = map { $_ => 1 } @{$wavelet_data->{tags}};
 
-    # XXX populate participants
-    # XXX populate tags
-    
     # XXX do threads
 
     return $wavelet;

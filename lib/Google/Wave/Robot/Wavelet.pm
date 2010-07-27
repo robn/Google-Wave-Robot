@@ -7,13 +7,12 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str Int HashRef ArrayRef Object);
-use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue ParticipantSet TagSet);
+use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue ParticipantSet);
 
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
 use Google::Wave::Robot::Participant::Set;
-use Google::Wave::Robot::Wavelet::TagSet;
 
 use Carp;
 
@@ -101,22 +100,41 @@ has root_thread => (
 =cut
 
 has _tags => (
-    is      => "rw",
-    isa     => TagSet,
+    traits  => [ "Hash" ],
+    is      => "ro",
+    isa     => HashRef[Str],
+    default => sub { {} },
     handles => {
-        tags => 'tags',
-        tag  => 'get',
+        tags        => 'keys',
+        tag         => 'get',
+        _add_tag    => 'set',
+        _remove_tag => 'delete',
     },
-    default => sub {
-        my $self = shift;
-        'Google::Wave::Robot::Wavelet::TagSet'->new(
-            wave_id         => $self->wave_id,
-            wavelet_id      => $self->wavelet_id,
-            operation_queue => $self->operation_queue,
-        ); 
-    },
-    lazy  => 1,
 );
+
+method add_tag ( Str $tag ) {
+    return if $self->tag($tag);
+    $self->_add_tag($tag, 1);
+
+    $self->operation_queue->wavelet_modify_tag(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        tag        => $tag,
+        modify_how => "add",
+    );
+}
+
+method remove_tag ( Str $tag ) {
+    return if !$self->tag($tag);
+    $self->_remove_tag($tag);
+
+    $self->operation_queue->wavelet_modify_tag(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        tag        => $tag,
+        modify_how => "remove",
+    );
+}
 
 has root_blip_id => (
     is      => "ro",

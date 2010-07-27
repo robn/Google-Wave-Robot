@@ -182,6 +182,8 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
 
     #for my $participant (values %{$json->
 
+    %{$args->{_tags}} = map { $_ => 1 } @{$wavelet_data->{tags}};
+
     # XXX populate participants
     # XXX populate tags
     

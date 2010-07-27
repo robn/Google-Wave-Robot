@@ -139,7 +139,7 @@ method capabilities_xml () {
     my $xml =
         q{<?xml version="1.0"?>}.
         q{<w:robot xmlns:w="http://wave.google.com/extensions/robots/1.0">}.
-            q{<w:version>}.$self->capabilities_hash.q{</w:version>}.
+            q{<w:version>}.sprintf(q{0x%08x}, $self->capabilities_hash).q{</w:version>}.
             q{<w:protocolversion>}.Google::Wave::Robot::Operation::PROTOCOL_VERSION.q{</w:protocolversion>};
 
     if ($self->_consumer_key) {

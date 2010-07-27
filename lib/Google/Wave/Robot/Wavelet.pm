@@ -12,7 +12,6 @@ use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue Participant);
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
-use Google::Wave::Robot::Participant::Set;
 
 use Carp;
 

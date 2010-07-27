@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Str Int ArrayRef);
+use MooseX::Types::Moose qw(Str ArrayRef);
 use Google::Wave::Robot::Types qw(Operation);
 
 use Google::Wave::Robot::Operation;
@@ -17,7 +17,7 @@ my $next_operation_id = 1;
 
 has capabilities_hash => (
     is  => "rw",
-    isa => Int,
+    isa => Str,
 );
 
 has _pending => (
@@ -78,7 +78,7 @@ method serialize ( Str :$method_prefix? = '' ) {
             method => Google::Wave::Robot::Operation::ROBOT_NOTIFY,
             id     => Google::Wave::Robot::Operation::NOTIFY_OP_ID,
             params => {
-                capabilitiesHash => sprintf(q{0x%08x}, $self->capabilities_hash),
+                capabilitiesHash => $self->capabilities_hash,
                 protocolVersion  => Google::Wave::Robot::Operation::PROTOCOL_VERSION,
             },
         );

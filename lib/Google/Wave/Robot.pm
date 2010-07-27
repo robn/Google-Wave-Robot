@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Str Int HashRef CodeRef);
+use MooseX::Types::Moose qw(Str HashRef CodeRef);
 use MooseX::Types::JSON qw(JSON);
 
 use Google::Wave::Robot::Operation;
@@ -45,9 +45,9 @@ has "_handlers" => (
 
 has "capabilities_hash" => (
     is      => "ro",
-    isa     => Int,
+    isa     => Str,
     writer  => "_set_capabilities_hash",
-    default => 0,
+    default => "0x0",
 );
 
 has name => (
@@ -117,6 +117,8 @@ my $hash_func = sub {
 
 # XXX include context and filter
 method register_handler ( Str $event_class, CodeRef $callback ) {
+    use bigint;
+
     my $type = $event_class->type;
 
     $self->_handlers->{$type} = {
@@ -126,20 +128,24 @@ method register_handler ( Str $event_class, CodeRef $callback ) {
         # XXX filter
     };
 
-    $self->_set_capabilities_hash((
-        $self->capabilities_hash * 13 +
+    my $old_hash = hex($self->capabilities_hash);
+
+    my $hash = (
+        $old_hash * 13 +
         $hash_func->(Google::Wave::Robot::Operation::PROTOCOL_VERSION) + 
         $hash_func->($type)
         # XXX $hash_func->($context) +
         # XXX $hash_func->($filter)
-    ) & 0xfffffff);
+    ) & 0xfffffff;
+
+    $self->_set_capabilities_hash(sprintf(q{0x%08x}, $hash));
 }
 
 method capabilities_xml () {
     my $xml =
         q{<?xml version="1.0"?>}.
         q{<w:robot xmlns:w="http://wave.google.com/extensions/robots/1.0">}.
-            q{<w:version>}.sprintf(q{0x%08x}, $self->capabilities_hash).q{</w:version>}.
+            q{<w:version>}.$self->capabilities_hash.q{</w:version>}.
             q{<w:protocolversion>}.Google::Wave::Robot::Operation::PROTOCOL_VERSION.q{</w:protocolversion>};
 
     if ($self->_consumer_key) {

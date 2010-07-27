@@ -77,7 +77,7 @@ has data_documents => (
 
 has participants => (
     is      => "ro",
-    isa     => ParticipantSet,  # XXX needs handlers that hook ADD_PARTICIPANT
+    isa     => ParticipantSet,
     handles => {
         participant => 'get',
     },

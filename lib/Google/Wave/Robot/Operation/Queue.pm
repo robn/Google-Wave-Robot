@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Str ArrayRef);
+use MooseX::Types::Moose qw(Str Int ArrayRef);
 use Google::Wave::Robot::Types qw(Operation);
 
 use Google::Wave::Robot::Operation;
@@ -17,7 +17,7 @@ my $next_operation_id = 1;
 
 has capabilities_hash => (
     is  => "rw",
-    isa => Str,
+    isa => Int,
 );
 
 has _pending => (
@@ -71,16 +71,20 @@ method _new_wavelet_data ( Str :$domain, ArrayRef :$participants ) {
 }
 
 method serialize ( Str :$method_prefix? = '' ) {
-    my $notify = Google::Wave::Robot::Operation->new(
-        method => Google::Wave::Robot::Operation::ROBOT_NOTIFY,
-        id     => Google::Wave::Robot::Operation::NOTIFY_OP_ID,
-        params => {
-            capabilitiesHash => $self->capabilities_hash,
-            protocolVersion  => Google::Wave::Robot::Operation::PROTOCOL_VERSION,
-        },
-    );
+    my @ops = @{$self->_pending};
 
-    return [map { $_->serialize(method_prefix => $method_prefix) } ($notify, @{$self->_pending})];
+    if ($self->capabilities_hash) {
+        unshift @ops, Google::Wave::Robot::Operation->new(
+            method => Google::Wave::Robot::Operation::ROBOT_NOTIFY,
+            id     => Google::Wave::Robot::Operation::NOTIFY_OP_ID,
+            params => {
+                capabilitiesHash => sprintf(q{0x%08x}, $self->capabilities_hash),
+                protocolVersion  => Google::Wave::Robot::Operation::PROTOCOL_VERSION,
+            },
+        );
+    }
+
+    return [map { $_->serialize(method_prefix => $method_prefix) } @ops];
 }
 
 method new_operation ( Str :$method, Str :$wave_id?, Str :$wavelet_id?, HashRef :$params? = {}) {

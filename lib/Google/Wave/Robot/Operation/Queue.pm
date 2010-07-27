@@ -222,6 +222,26 @@ method wavelet_modify_tag ( Str :$wave_id, Str :$wavelet_id, Str :$tag, Str :$mo
     );
 }
 
+method blip_continue_thread ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
+    my $blip_data = $self->_new_blip_data(
+        wave_id        => $wave_id,
+        wavelet_id     => $wavelet_id,
+        parent_blip_id => $blip_id,
+    );
+
+    $self->new_operation(
+        method     => Google::Wave::Robot::Operation::BLIP_CONTINUE_THREAD,
+        wave_id    => $wave_id,
+        wavelet_id => $wavelet_id,
+        params     => {
+            blipId   => $blip_id,
+            blipData => $blip_data,
+        },
+    );
+
+    return $blip_data;
+}
+
 method blip_create_child ( Str :$wave_id, Str :$wavelet_id, Str :$blip_id ) {
     my $blip_data = $self->_new_blip_data(
         wave_id        => $wave_id,

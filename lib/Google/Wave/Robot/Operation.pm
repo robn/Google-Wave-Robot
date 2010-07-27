@@ -19,6 +19,7 @@ use constant {
     WAVELET_DATADOC_SET             => 'wavelet.datadoc.set',
     WAVELET_MODIFY_TAG              => 'wavelet.modifyTag',
     WAVELET_MODIFY_PARTICIPANT_ROLE => 'wavelet.modifyParticipantRole',
+    BLIP_CONTINUE_THREAD            => 'blip.continueThread',
     BLIP_CREATE_CHILD               => 'blip.createChild',
     BLIP_DELETE                     => 'blip.delete',
     DOCUMENT_APPEND_MARKUP          => 'document.appendMarkup',

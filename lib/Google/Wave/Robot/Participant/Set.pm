@@ -22,6 +22,7 @@ has _participants => (
         _set   => 'set',
         get    => 'get',
     },
+    #init_arg => "participants"
 );
 
 has wave_id => (

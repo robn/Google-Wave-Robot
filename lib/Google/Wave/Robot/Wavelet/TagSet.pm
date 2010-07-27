@@ -9,8 +9,10 @@ use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(HashRef Bool Str);
 use Google::Wave::Robot::Types qw(OperationQueue);
 
+use Google::Wave::Robot::Operation::Queue;
+
 has _tags => (
-    traints => [ "Hash" ],
+    traits  => [ "Hash" ],
     is      => "ro",
     isa     => HashRef[Str],
     default => sub { {} },
@@ -72,7 +74,6 @@ method remove ( Str $tag ) {
 }
 
 __PACKAGE__->meta->make_immutable;
-
 
 1;
 

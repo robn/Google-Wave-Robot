@@ -13,6 +13,7 @@ use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
 use Google::Wave::Robot::Participant::Set;
+use Google::Wave::Robot::Wavelet::TagSet;
 
 use Carp;
 
@@ -99,21 +100,22 @@ has root_thread => (
 );
 =cut
 
-has tags => (
-    is      => "ro",
-    isa     => TagSet
+has _tags => (
+    is      => "rw",
+    isa     => TagSet,
     handles => {
-        tag => 'get',
+        tags => 'tags',
+        tag  => 'get',
     },
     default => sub {
         my $self = shift;
-        Google::Wave::Robot::Wavelet::TagSet->new(
+        'Google::Wave::Robot::Wavelet::TagSet'->new(
             wave_id         => $self->wave_id,
             wavelet_id      => $self->wavelet_id,
-            operation_queue => $self->operation_queue
-        ) 
+            operation_queue => $self->operation_queue,
+        ); 
     },
-    lazy    => 1,
+    lazy  => 1,
 );
 
 has root_blip_id => (
@@ -159,6 +161,8 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
         my $blip = Google::Wave::Robot::Blip->new_from_json($blip_data, operation_queue => $operation_queue, other_blips => $blips);
         $blips->add($blip->blip_id, $blip);
     }
+
+    #for my $participant (values %{$json->
 
     # XXX populate participants
     # XXX populate tags

@@ -6,6 +6,7 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
+use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose qw(Str Int HashRef ArrayRef Object);
 use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue Participant);
 
@@ -82,16 +83,25 @@ has root_thread => (
 );
 =cut
 
+subtype 'HashRefOfParticipants',
+    as HashRef[Participant];
+
+coerce 'HashRefOfParticipants',
+    from ArrayRef[Str],
+    via { scalar { map { $_ => Google::Wave::Robot::Participant->new(id => $_) } @{$_} } };
+
 has _participants => (
     traits  => [ "Hash" ],
     is      => "ro",
-    isa     => HashRef[Participant],
+    isa     => 'HashRefOfParticipants',
     default => sub { {} },
+    init_arg => "participants",
     handles => {
         participants     => 'keys',
         participant      => 'get',
         _add_participant => 'set',
     },
+    coerce => 1,
 );
 
 method add_participant ( Str $id ) {
@@ -186,16 +196,14 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
         $blips->add($blip->blip_id, $blip);
     }
 
-    #for my $participant (values %{$json->
-
-    %{$args{_participants}} = map {
+    %{$args{participants}} = map {
         $_ => Google::Wave::Robot::Participant->new(
             id   => $_,
             role => $wavelet_data->{participantRoles}->{$_} // "FULL"
         )
     } @{$wavelet_data->{participants}};
  
-    %{$args{_tags}}         = map { $_ => 1 } @{$wavelet_data->{tags}};
+    %{$args{_tags}} = map { $_ => 1 } @{$wavelet_data->{tags}};
 
     # XXX do threads
 

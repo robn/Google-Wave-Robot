@@ -101,7 +101,7 @@ has _participants => (
     default  => sub { {} },
     init_arg => "participants",
     handles  => {
-        participants     => 'keys',
+        participants     => 'values',
         participant      => 'get',
         _add_participant => 'set',
     },

@@ -115,11 +115,21 @@ method add_participant ( Str $id ) {
     );
 }
 
+
+subtype 'HashRefOfStr',
+    as HashRef[Str];
+
+coerce 'HashRefOfStr',
+    from ArrayRef[Str],
+    via { scalar { map { $_ => 1 } @{$_} } };
+
 has _tags => (
-    traits  => [ "Hash" ],
-    is      => "ro",
-    isa     => HashRef[Str],
-    default => sub { {} },
+    traits   => [ "Hash" ],
+    is       => "ro",
+    isa      => 'HashRefOfStr',
+    coerce   => 1,
+    default  => sub { {} },
+    init_arg => 'tags',
     handles => {
         tags        => 'keys',
         tag         => 'get',
@@ -151,6 +161,7 @@ method remove_tag ( Str $tag ) {
         modify_how => "remove",
     );
 }
+
 
 has root_blip_id => (
     is      => "ro",
@@ -203,7 +214,7 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
         )
     } @{$wavelet_data->{participants}};
  
-    %{$args{_tags}} = map { $_ => 1 } @{$wavelet_data->{tags}};
+    $args{tags} = $wavelet_data->{tags};
 
     # XXX do threads
 

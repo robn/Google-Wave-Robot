@@ -83,6 +83,9 @@ has root_thread => (
 );
 =cut
 
+
+# XXX consider a string type here that matches foo@bar
+
 subtype 'HashRefOfParticipants',
     as HashRef[Participant];
 
@@ -91,17 +94,17 @@ coerce 'HashRefOfParticipants',
     via { scalar { map { $_ => Google::Wave::Robot::Participant->new(id => $_) } @{$_} } };
 
 has _participants => (
-    traits  => [ "Hash" ],
-    is      => "ro",
-    isa     => 'HashRefOfParticipants',
-    default => sub { {} },
+    traits   => [ "Hash" ],
+    is       => "ro",
+    isa      => 'HashRefOfParticipants',
+    coerce   => 1,
+    default  => sub { {} },
     init_arg => "participants",
-    handles => {
+    handles  => {
         participants     => 'keys',
         participant      => 'get',
         _add_participant => 'set',
     },
-    coerce => 1,
 );
 
 method add_participant ( Str $id ) {
@@ -130,7 +133,7 @@ has _tags => (
     coerce   => 1,
     default  => sub { {} },
     init_arg => 'tags',
-    handles => {
+    handles  => {
         tags        => 'keys',
         tag         => 'get',
         _add_tag    => 'set',

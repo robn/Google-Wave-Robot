@@ -46,7 +46,7 @@ method rpc_handler ( ClassName $class: Robot $robot, HashRef $env ) {
 
 method verify_token_handler ( ClassName $class: Robot $robot, HashRef $env ) {
     my ($st) = $env->{QUERY_STRING} =~ m/st=(\d+)/;
-    if ($st && $robot->security_token && $robot->security_token ne $st) {
+    if ($robot->security_token && (!$st || $robot->security_token ne $st)) {
         return $class->_output(401, 'text/plain', q{security token doesn't match});
     }
 

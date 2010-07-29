@@ -135,7 +135,7 @@ method wavelet_add_participant ( Str :$wave_id, Str :$wavelet_id, Str :$particip
     );
 }
 
-method wavelet_datadoc_set ( Str :$wave_id, Str :$wavelet_id, Str :$name, Str :$data ) {
+method wavelet_datadoc_set ( Str :$wave_id, Str :$wavelet_id, Str :$name, Str|Undef :$data ) {
     return $self->new_operation(
         method     => Google::Wave::Robot::Operation::WAVELET_DATADOC_SET,
         wave_id    => $wave_id,

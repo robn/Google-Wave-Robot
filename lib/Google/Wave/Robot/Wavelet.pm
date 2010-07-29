@@ -70,18 +70,45 @@ before robot_address => sub {
     confess "robot_address is already set" if @_ > 0 && $self->robot_address;
 };
 
-has data_documents => (
-    is      => "ro",
-    isa     => HashRef[Str],    # XXX key/value pairs, needs some handlers that hook DATADOC_SET
-    default => sub { {} },
+
+has _data_documents => (
+    traits   => [ "Hash" ],
+    is       => "ro",
+    isa      => HashRef[Str],
+    default  => sub { {} },
+    init_arg => "data_documents",
+    handles  => {
+        data_documents        => 'elements',
+        data_document         => 'get',
+        _add_data_document    => 'set',
+        _remove_data_document => 'delete',
+    },
 );
 
-=pod
-has root_thread => (
-    is  => "ro",
-    isa => Object,  # XXX BlipThread
-);
-=cut
+method add_data_document ( Str $name, Str $data ) {
+    return if $self->data_document($name);
+    $self->_add_data_document($name, $data);
+
+    $self->operation_queue->wavelet_datadoc_set(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        name       => $name,
+        data       => $data,
+    );
+}
+
+method remove_data_document ( Str $name ) {
+    return if !$self->data_document($name);
+    $self->_remove_data_document($name);
+
+    $self->operation_queue->wavelet_datadoc_set(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        name       => $name,
+        data       => undef,
+    );
+}
+
 
 
 # XXX consider a string type here that matches foo@bar
@@ -165,6 +192,13 @@ method remove_tag ( Str $tag ) {
     );
 }
 
+
+=pod
+has root_thread => (
+    is  => "ro",
+    isa => Object,  # XXX BlipThread
+);
+=cut
 
 has root_blip_id => (
     is      => "ro",

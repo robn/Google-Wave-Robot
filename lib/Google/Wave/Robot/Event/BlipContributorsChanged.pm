@@ -12,16 +12,26 @@ extends ("Google::Wave::Robot::Event");
 
 __PACKAGE__->register_event_class("BLIP_CONTRIBUTORS_CHANGED");
 
-has contributors_added => (
-    is      => "ro",
-    isa     => ArrayRef[Str],   # XXX ParticipantSet?
-    default => sub { [] },
+has _contributors_added => (
+    traits   => [ "Array" ],
+    is       => "ro",
+    isa      => ArrayRef[Str],
+    default  => sub { [] },
+    init_arg => "contributors_added",
+    handles  => {
+        contributors_added => 'elements',
+    },
 );
 
-has contributors_removed => (
-    is      => "ro",
-    isa     => ArrayRef[Str],
-    default => sub { [] },
+has _contributors_removed => (
+    traits   => [ "Array" ],
+    is       => "ro",
+    isa      => ArrayRef[Str],
+    default  => sub { [] },
+    init_arg => "contributors_removed",
+    handles  => {
+        contributors_removed => 'elements',
+    },
 );
 
 __PACKAGE__->meta->make_immutable;

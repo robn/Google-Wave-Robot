@@ -7,7 +7,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str ArrayRef);
-use Google::Wave::Robot::Types qw(Operation);
+use Google::Wave::Robot::Types qw(Operation ParticipantRole);
 
 use Google::Wave::Robot::Operation;
 
@@ -197,8 +197,7 @@ method wavelet_set_title ( Str :$wave_id, Str :$wavelet_id, Str :$title ) {
     );
 }
 
-method wavelet_modify_participant_role ( Str :$wave_id, Str :$wavelet_id, Str :$participant_id, Str :$role ) {
-    # XXX what type should $role have?
+method wavelet_modify_participant_role ( Str :$wave_id, Str :$wavelet_id, Str :$participant_id, ParticipantRole :$role ) {
     return $self->new_operation(
         method     => Google::Wave::Robot::Operation::WAVELET_MODIFY_PARTICIPANT_ROLE,
         wave_id    => $wave_id,

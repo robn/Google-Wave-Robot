@@ -5,9 +5,8 @@ use 5.010;
 use namespace::autoclean;
 
 use Moose;
-use MooseX::Method::Signatures;
 use MooseX::Types::Moose qw(Str);
-use Moose::Util::TypeConstraints;
+use Google::Wave::Robot::Types qw(ParticipantRole);
 
 # XXX include profile stuff here?
 
@@ -19,7 +18,7 @@ has id => (
 
 has role => (
 	is       => "ro",
-	isa      => enum([qw(FULL READ_ONLY)]),
+	isa      => ParticipantRole,
 	default  => "FULL",
 );
 

@@ -5,7 +5,7 @@ use 5.010;
 use namespace::autoclean;
 
 use MooseX::Types -declare => [qw(
-    Robot Wavelet Blip BlipSet Operation OperationQueue Participant
+    Robot Wavelet Blip BlipSet Operation OperationQueue Participant ParticipantRole
 )];
 
 use MooseX::Types::Moose qw(Str);
@@ -23,6 +23,9 @@ class_type Participant,    { class => 'Google::Wave::Robot::Participant' };
 coerce Participant,
     from Str,
         via { Google::Wave::Robot::Participant->new(id => $_) };
+
+subtype ParticipantRole,
+    as enum([qw(FULL READ_ONLY)]);
 
 1;
 

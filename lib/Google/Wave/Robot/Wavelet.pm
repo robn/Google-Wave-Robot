@@ -253,8 +253,9 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
  
     $args{tags} = $wavelet_data->{tags};
 
+    $args{data_documents} = $wavelet_data->{dataDocuments};
+
     # XXX threads
-    # XXX data documents
 
     return $wavelet;
 }

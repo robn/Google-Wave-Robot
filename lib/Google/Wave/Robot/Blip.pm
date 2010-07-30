@@ -48,10 +48,15 @@ has creator => (
     default => '',
 );
 
-has contributors => (
-    is      => "ro",
-    isa     => ArrayRef[Str],  # XXX ParticipantSet?
-    default => sub { [] },
+has _contributors => (
+    traits   => [ "Array" ],
+    is       => "ro",
+    isa      => ArrayRef[Str],
+    default  => sub { [] },
+    init_arg => "contributors",
+    handles  => {
+        contributors => 'elements',
+    },
 );
 
 has last_modified_time => (

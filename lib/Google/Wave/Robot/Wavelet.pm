@@ -47,11 +47,35 @@ has last_modified_time => (
     default  => 0,
 );
 
+
 has title => (
-    is       => "rw",
-    isa      => Str,  # XXX hook setter to call set_title and adjust the content
-    default  => '',
+    is      => "rw",
+    isa     => Str,
+    default => '',
 );
+
+around title => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return $self->$orig if not @_;
+
+    # XXX util.force_unicode(title)
+ 
+    my $title = shift;
+    confess "wavelet title may not contain a newline" if $title =~ m/\n/smg;
+
+    $self->$orig($title);
+
+    $self->operation_queue->wavelet_set_title(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        title      => $title,
+    );
+
+    # XXX adjust the contents of the root blip
+};
+
 
 has operation_queue => (
     is       => "ro",

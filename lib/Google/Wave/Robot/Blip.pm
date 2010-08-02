@@ -129,6 +129,24 @@ method new_from_json ( ClassName $class: HashRef $json, OperationQueue :$operati
     return $blip;
 }
 
+method continue_thread () {
+    my $blip_data = $self->operation_queue->blip_continue_thread(
+        wave_id    => $self->wave_id,
+        wavelet_id => $self->wavelet_id,
+        blip_id    => $self->blip_id,
+    );
+
+    my $blip = Google::Wave::Robot::Blip->new(
+        json            => $blip_data,
+        operation_queue => $self->operation_queue,
+        other_blips     => $self->_other_blips,
+    );
+
+    $self->_other_blips->add($blip->blip_id, $blip);
+
+    return $blip;
+}
+
 method reply () {
     my $blip_data = $self->operation_queue->blip_create_child(
         wave_id    => $self->wave_id,

@@ -236,7 +236,7 @@ has blips => (
     handles => {
         blip => 'get',
     },
-    default => sub { Google::Wave::Robot::Blip::Set->new },
+    default => sub { Google::Wave::Robot::Blip::Set->new }, # XXX array coercion?
     lazy    => 1,
 );
 

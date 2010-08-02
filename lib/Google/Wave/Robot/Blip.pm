@@ -96,6 +96,7 @@ has elements => (
 );
 =cut
 
+# XXX this probably needs more array magic
 has _other_blips => (
     is      => "ro",
     isa     => BlipSet,

@@ -135,12 +135,16 @@ method reply () {
         wavelet_id => $self->wavelet_id,
         blip_id    => $self->blip_id,
     );
+
     my $blip = Google::Wave::Robot::Blip->new(
         json            => $blip_data,
         operation_queue => $self->operation_queue,
         other_blips     => $self->_other_blips,
     );
+
     $self->_other_blips->add($blip->blip_id, $blip);
+
+    return $blip;
 }
 
 method append_markup ( Str $markup ) {

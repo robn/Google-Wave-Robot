@@ -136,8 +136,8 @@ method continue_thread () {
         blip_id    => $self->blip_id,
     );
 
-    my $blip = Google::Wave::Robot::Blip->new(
-        json            => $blip_data,
+    my $blip = Google::Wave::Robot::Blip->new_from_json(
+        $blip_data,
         operation_queue => $self->operation_queue,
         other_blips     => $self->_other_blips,
     );
@@ -154,8 +154,8 @@ method reply () {
         blip_id    => $self->blip_id,
     );
 
-    my $blip = Google::Wave::Robot::Blip->new(
-        json            => $blip_data,
+    my $blip = Google::Wave::Robot::Blip->new_from_json(
+        $blip_data,
         operation_queue => $self->operation_queue,
         other_blips     => $self->_other_blips,
     );

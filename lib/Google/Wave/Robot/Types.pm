@@ -10,8 +10,6 @@ use MooseX::Types -declare => [qw(
 
 use MooseX::Types::Moose qw(Str);
 
-use Google::Wave::Robot::Participant;
-
 class_type Robot,          { class => 'Google::Wave::Robot' };
 class_type Wavelet,        { class => 'Google::Wave::Robot::Wavelet' };
 class_type Blip,           { class => 'Google::Wave::Robot::Blip' };
@@ -24,8 +22,9 @@ coerce Participant,
     from Str,
         via { Google::Wave::Robot::Participant->new(id => $_) };
 
-subtype ParticipantRole,
-    as enum([qw(FULL READ_ONLY)]);
+enum ParticipantRole, [qw(FULL READ_ONLY)];
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

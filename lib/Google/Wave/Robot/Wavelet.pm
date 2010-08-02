@@ -8,7 +8,7 @@ use Moose;
 use MooseX::Method::Signatures;
 use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose qw(Str Int HashRef ArrayRef Object);
-use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue Participant);
+use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue Participant ParticipantRole);
 
 use Google::Wave::Robot::Blip;
 use Google::Wave::Robot::Blip::Set;

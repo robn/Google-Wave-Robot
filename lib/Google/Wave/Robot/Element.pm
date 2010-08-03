@@ -6,15 +6,17 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
-use MooseX::Types::Moose qw(Str HashRef);
+use MooseX::Types::Moose qw(Str HashRef ArrayRef);
 use Google::Wave::Robot::Types qw(Wavelet);
 
 my %element_class_for;
+my %attributes_for;
 my %type_for;
 
-method register_element_class ( ClassName $class: Str $type, Str :class($element_class)? ) {
+method register_element_class ( ClassName $class: Str $type, Str :class($element_class)?, ArrayRef[Str] :$attributes? ) {
     $element_class //= caller;
     $element_class_for{$type} = $element_class;
+    $attributes_for{$type} = $attributes = $attributes // [];
     $type_for{$element_class} = $type;
 }
 
@@ -36,9 +38,20 @@ method new_from_json ( ClassName $class: HashRef $json ) {
     my $element_class = $element_class_for{$type};
     confess "element type '$type' not registered" if !$element_class;
 
-    return $element_class->new_from_properties($json->{properties}) if exists $json->{properties};
+    my %args;
 
-    return $element_class->new;
+    if (exists $json->{properties}) {
+        $args{properties} = $json->{properties};
+
+        for my $key (@{$attributes_for{$type}}) {
+            next if !exists $args{properties}->{$key};
+            my $ukey = $key;
+            $ukey =~ s/([A-Z])/'_'.lc($1)/ge;
+            $args{$ukey} = $json->{properties}->{$key};
+        }
+    }
+
+    return $element_class->new(%args);
 }
 
 __PACKAGE__->meta->make_immutable;

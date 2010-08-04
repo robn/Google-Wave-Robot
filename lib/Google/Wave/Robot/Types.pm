@@ -5,7 +5,7 @@ use 5.010;
 use namespace::autoclean;
 
 use MooseX::Types -declare => [qw(
-    Robot Wavelet Blip BlipSet Operation OperationQueue Participant ParticipantRole
+    Robot Wavelet Blip BlipSet Element Operation OperationQueue Participant ParticipantRole
 )];
 
 use MooseX::Types::Moose qw(Str);

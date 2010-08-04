@@ -6,8 +6,9 @@ use namespace::autoclean;
 
 use Moose;
 use MooseX::Method::Signatures;
+use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose qw(Str Int HashRef ArrayRef);
-use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue);
+use Google::Wave::Robot::Types qw(Blip BlipSet Element OperationQueue);
 
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
@@ -105,12 +106,19 @@ has annotations => (
     is  => "ro",
     isa => ArrayRef,   # XXX ArrayRef[Annotation]
 );
-
-has elements => (
-    is       => "ro",
-    isa      => ArrayRef,   # XXX ArrayRef[Elements]
-);
 =cut
+
+has _elements => (
+    traits   => [ "Hash" ],
+    is       => "ro",
+    isa      => HashRef[Element],
+    default  => sub { {} },
+    init_arg => "elements",
+    handles  => {
+        elements       => 'values',
+        get_element_at => 'get',
+    },
+);
 
 # XXX this probably needs more array magic
 has _other_blips => (

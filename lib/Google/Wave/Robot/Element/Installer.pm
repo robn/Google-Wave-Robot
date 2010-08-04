@@ -1,4 +1,4 @@
-package Google::Wave::Robot::Element::Installer
+package Google::Wave::Robot::Element::Installer;
 
 use 5.010;
 

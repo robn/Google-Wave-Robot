@@ -12,6 +12,22 @@ use Google::Wave::Robot::Types qw(Blip BlipSet OperationQueue);
 use Google::Wave::Robot::Blip::Set;
 use Google::Wave::Robot::Operation::Queue;
 
+use Google::Wave::Robot::Annotation;
+
+use Google::Wave::Robot::Element;
+use Google::Wave::Robot::Element::Attachment;
+use Google::Wave::Robot::Element::Button;
+use Google::Wave::Robot::Element::Check;
+use Google::Wave::Robot::Element::Gadget;
+use Google::Wave::Robot::Element::Image;
+use Google::Wave::Robot::Element::Input;
+use Google::Wave::Robot::Element::Installer;
+use Google::Wave::Robot::Element::Label;
+use Google::Wave::Robot::Element::Password;
+use Google::Wave::Robot::Element::RadioButtonGroup;
+use Google::Wave::Robot::Element::RadioButton;
+use Google::Wave::Robot::Element::TextArea;
+
 has blip_id => (
     is       => "ro",
     isa      => Str,

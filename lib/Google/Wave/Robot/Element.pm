@@ -10,14 +10,22 @@ use MooseX::Types::Moose qw(Str HashRef ArrayRef);
 use Google::Wave::Robot::Types qw(Wavelet);
 
 my %element_class_for;
-my %attributes_for;
 my %type_for;
+my %attributes_for;
 
 method register_element_class ( ClassName $class: Str $type, Str :class($element_class)?, ArrayRef[Str] :$attributes? ) {
     $element_class //= caller;
     $element_class_for{$type} = $element_class;
-    $attributes_for{$type} = $attributes = $attributes // [];
     $type_for{$element_class} = $type;
+
+    $attributes //= [];
+    for my $attribute (@$attributes) {
+        my ($name, $target) = $attribute =~ m/^([^=]+)=?(.*)$/;
+        confess "couldn't parse element attribute '$attribute'" if !$name;
+
+        $target = $name if !$target;
+        $attributes_for{$type}->{$name} = $target;
+    }
 }
 
 method type ( ClassName $class: ) {
@@ -43,11 +51,12 @@ method new_from_json ( ClassName $class: HashRef $json ) {
     if (exists $json->{properties}) {
         $args{properties} = $json->{properties};
 
-        for my $key (@{$attributes_for{$type}}) {
-            next if !exists $args{properties}->{$key};
-            my $ukey = $key;
-            $ukey =~ s/([A-Z])/'_'.lc($1)/ge;
-            $args{$ukey} = $json->{properties}->{$key};
+        for my $name (keys %{$attributes_for{$type}}) {
+            next if !exists $args{properties}->{$name};
+
+            my $target = $attributes_for{$type}->{$name};
+            $target =~ s/([A-Z])/'_'.lc($1)/ge;
+            $args{$target} = $json->{properties}->{$name};
         }
     }
 

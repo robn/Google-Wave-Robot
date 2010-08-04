@@ -23,7 +23,11 @@ method register_element_class ( ClassName $class: Str $type, Str :class($element
         my ($name, $target) = $attribute =~ m/^([^=]+)=?(.*)$/;
         confess "couldn't parse element attribute '$attribute'" if !$name;
 
-        $target = $name if !$target;
+        if (!$target) {
+            $target = $name;
+            $target =~ s/([A-Z])/'_'.lc($1)/ge;
+        }
+
         $attributes_for{$type}->{$name} = $target;
     }
 }
@@ -53,10 +57,7 @@ method new_from_json ( ClassName $class: HashRef $json ) {
 
         for my $name (keys %{$attributes_for{$type}}) {
             next if !exists $args{properties}->{$name};
-
-            my $target = $attributes_for{$type}->{$name};
-            $target =~ s/([A-Z])/'_'.lc($1)/ge;
-            $args{$target} = $json->{properties}->{$name};
+            $args{$attributes_for{$type}->{$name}} = $json->{properties}->{$name};
         }
     }
 
